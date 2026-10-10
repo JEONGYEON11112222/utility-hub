@@ -26,6 +26,10 @@ export const metadata: Metadata = {
   applicationName: siteConfig.name,
   // Fallback for routes without page metadata (e.g. 404). Pages use pageMetadata() from lib/seo.
   openGraph: baseOpenGraph,
+  // Google Search Console ownership (HTML tag method). This token is public by design.
+  verification: {
+    google: "LYFHxobkj7gIewcYc1MiuVMf-C3hy4HY9T8VyLdUtk4",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
