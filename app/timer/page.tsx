@@ -15,12 +15,12 @@ const faqs = [
   {
     question: "Does the timer keep running if I switch tabs?",
     answer:
-      "Yes. The timer records the moment your countdown should end and checks the clock against it, so it stays accurate even when your browser slows down background tabs. The remaining time also appears in the tab title.",
+      "Yes. The timer records the moment your countdown should end and measures the time left against your device's clock, so the time shown is correct whenever you look at it, even after switching tabs. The remaining time also appears in the tab title. Browsers can slow down pages in background tabs, so the alert may occasionally arrive a little late there. For the most dependable alert, keep the timer tab visible.",
   },
   {
     question: "Will I hear an alert when the time is up?",
     answer:
-      "If “Play a chime when time is up” is checked, a short chime plays when the countdown reaches zero. Make sure your device is not muted. A completion message also appears on the page.",
+      "If “Play a chime when time is up” is checked, a short chime plays when the countdown reaches zero. Make sure your device is not muted. A completion message also appears on the page. On phones and tablets, the browser may pause the page while the screen is locked, so the chime may not play until you return to it.",
   },
   {
     question: "What is the longest countdown I can set?",

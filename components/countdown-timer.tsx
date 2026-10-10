@@ -32,6 +32,128 @@ function playChime(ctx: AudioContext) {
   });
 }
 
+export type ClockScheduler = {
+  now(): number;
+  setTimeout(fn: () => void, ms: number): number;
+  clearTimeout(id: number): void;
+  setInterval(fn: () => void, ms: number): number;
+  clearInterval(id: number): void;
+};
+
+type ClockState = "idle" | "running" | "paused" | "finished";
+
+/**
+ * Tracks one countdown independently of React. Remaining time is always derived from a fixed
+ * end time, so the display is correct whenever it is checked. Completion is detected by a
+ * display interval, a one-shot timeout aimed at the end time, and explicit check() calls
+ * (e.g. when the tab becomes visible). Browsers may still delay timers in background tabs,
+ * so the exact moment of the alert there is not guaranteed. finish() runs at most once per run.
+ */
+export class CountdownClock {
+  private state: ClockState = "idle";
+  private endAt = 0;
+  private remaining = 0;
+  private intervalId: number | null = null;
+  private timeoutId: number | null = null;
+
+  constructor(
+    private readonly scheduler: ClockScheduler,
+    private readonly onTick: (remainingMs: number) => void,
+    private readonly onFinish: () => void,
+    private readonly tickMs = TICK_MS,
+  ) {}
+
+  get currentState(): ClockState {
+    return this.state;
+  }
+
+  start(durationMs: number) {
+    this.clearTimers();
+    this.endAt = this.scheduler.now() + durationMs;
+    this.state = "running";
+    this.arm();
+  }
+
+  /** Returns the time left. If the end time has already passed, the run finishes instead. */
+  pause(): number {
+    if (this.state !== "running") return this.remaining;
+    this.check();
+    if (this.state !== "running") return 0;
+    this.remaining = Math.max(0, this.endAt - this.scheduler.now());
+    this.clearTimers();
+    this.state = "paused";
+    return this.remaining;
+  }
+
+  resume() {
+    if (this.state !== "paused") return;
+    this.endAt = this.scheduler.now() + this.remaining;
+    this.state = "running";
+    this.arm();
+  }
+
+  reset() {
+    this.clearTimers();
+    this.state = "idle";
+    this.remaining = 0;
+  }
+
+  /** Recalculates now and finishes the run if the end time has passed. Safe to call repeatedly. */
+  check = () => {
+    if (this.state !== "running") return;
+    const left = this.endAt - this.scheduler.now();
+    if (left <= 0) this.finish();
+    else this.onTick(left);
+  };
+
+  /** (Re)starts timers for a running countdown, e.g. after the component becomes visible again. */
+  arm() {
+    if (this.state !== "running") return;
+    this.clearTimers();
+    this.intervalId = this.scheduler.setInterval(this.check, this.tickMs);
+    this.scheduleEndTimeout();
+    this.check();
+  }
+
+  /** Stops timers without changing state, e.g. when the component is hidden or unmounted. */
+  suspend() {
+    this.clearTimers();
+  }
+
+  private scheduleEndTimeout() {
+    const left = Math.max(0, this.endAt - this.scheduler.now());
+    this.timeoutId = this.scheduler.setTimeout(() => {
+      this.timeoutId = null;
+      if (this.state !== "running") return;
+      if (this.endAt - this.scheduler.now() <= 0) this.finish();
+      // Timers can fire slightly early; aim again at the remaining time.
+      else this.scheduleEndTimeout();
+    }, left);
+  }
+
+  private finish() {
+    if (this.state !== "running") return;
+    this.state = "finished";
+    this.clearTimers();
+    this.onFinish();
+  }
+
+  private clearTimers() {
+    if (this.intervalId !== null) this.scheduler.clearInterval(this.intervalId);
+    if (this.timeoutId !== null) this.scheduler.clearTimeout(this.timeoutId);
+    this.intervalId = null;
+    this.timeoutId = null;
+  }
+}
+
+const browserScheduler: ClockScheduler = {
+  now: () => Date.now(),
+  setTimeout: (fn, ms) => window.setTimeout(fn, ms),
+  clearTimeout: (id) => window.clearTimeout(id),
+  setInterval: (fn, ms) => window.setInterval(fn, ms),
+  clearInterval: (id) => window.clearInterval(id),
+};
+
 type CountdownTimerProps = {
   /** Minutes preselected when the timer first loads. Seconds start at 0. */
   initialMinutes?: number;
@@ -47,9 +169,8 @@ export function CountdownTimer({ initialMinutes = 5 }: CountdownTimerProps) {
   const [announcement, setAnnouncement] = useState("");
   const [showErrors, setShowErrors] = useState(false);
 
-  // The countdown is derived from a fixed end time rather than counting ticks,
-  // so throttled intervals in background tabs cannot make it drift.
-  const endAtRef = useRef(0);
+  // Created on mount; the event handlers below only run after mount.
+  const clockRef = useRef<CountdownClock | null>(null);
   const audioRef = useRef<AudioContext | null>(null);
   const soundOnRef = useRef(soundOn);
 
@@ -74,28 +195,31 @@ export function CountdownTimer({ initialMinutes = 5 }: CountdownTimerProps) {
   }, [soundOn]);
 
   useEffect(() => {
-    if (status !== "running") return;
+    if (!clockRef.current) {
+      clockRef.current = new CountdownClock(
+        browserScheduler,
+        (left) => setRemainingMs(left),
+        () => {
+          setRemainingMs(0);
+          setStatus("finished");
+          setAnnouncement("Time's up!");
+          if (soundOnRef.current && audioRef.current) playChime(audioRef.current);
+        },
+      );
+    }
+    const clock = clockRef.current;
 
-    const tick = () => {
-      const left = endAtRef.current - Date.now();
-      if (left <= 0) {
-        setRemainingMs(0);
-        setStatus("finished");
-        setAnnouncement("Time's up!");
-        if (soundOnRef.current && audioRef.current) playChime(audioRef.current);
-      } else {
-        setRemainingMs(left);
-      }
-    };
-
-    const interval = window.setInterval(tick, TICK_MS);
+    // Runs on mount and whenever the route becomes visible again (Cache Components keeps
+    // hidden routes mounted and cleans up their effects). A countdown that ended while hidden
+    // finishes here exactly once.
+    clock.arm();
     // Browsers throttle timers in hidden tabs; recalculate as soon as the tab is visible again.
-    document.addEventListener("visibilitychange", tick);
+    document.addEventListener("visibilitychange", clock.check);
     return () => {
-      window.clearInterval(interval);
-      document.removeEventListener("visibilitychange", tick);
+      document.removeEventListener("visibilitychange", clock.check);
+      clock.suspend();
     };
-  }, [status]);
+  }, []);
 
   // Show the countdown in the browser tab title so it can be checked from other tabs.
   const tabLabel =
@@ -111,6 +235,9 @@ export function CountdownTimer({ initialMinutes = 5 }: CountdownTimerProps) {
 
   useEffect(() => {
     return () => {
+      // This cleanup also runs when Cache Components hides the route. Keep the audio context
+      // while a countdown is running so the chime can still play after the route is shown again.
+      if (clockRef.current?.currentState === "running") return;
       audioRef.current?.close();
       audioRef.current = null;
     };
@@ -129,15 +256,19 @@ export function CountdownTimer({ initialMinutes = 5 }: CountdownTimerProps) {
       return;
     }
     ensureAudio();
-    endAtRef.current = Date.now() + parsed.totalMs;
     setTotalMs(parsed.totalMs);
     setRemainingMs(parsed.totalMs);
     setStatus("running");
     setAnnouncement(`Timer started for ${describeDuration(parsed.totalMs / 1000)}.`);
+    clockRef.current?.start(parsed.totalMs);
   }
 
   function pause() {
-    const left = Math.max(0, endAtRef.current - Date.now());
+    const clock = clockRef.current;
+    if (!clock) return;
+    const left = clock.pause();
+    // If the end time had already passed, pause() finished the run instead.
+    if (clock.currentState !== "paused") return;
     setRemainingMs(left);
     setStatus("paused");
     setAnnouncement(`Paused with ${describeDuration(remainingSeconds(left))} left.`);
@@ -145,12 +276,13 @@ export function CountdownTimer({ initialMinutes = 5 }: CountdownTimerProps) {
 
   function resume() {
     ensureAudio();
-    endAtRef.current = Date.now() + remainingMs;
     setStatus("running");
     setAnnouncement("Timer resumed.");
+    clockRef.current?.resume();
   }
 
   function reset() {
+    clockRef.current?.reset();
     setStatus("idle");
     setRemainingMs(0);
     setTotalMs(0);
