@@ -20,6 +20,19 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Production site URL (required before deploying)
+
+Canonical URLs, Open Graph URLs, `/sitemap.xml`, and `/robots.txt` are all built from one setting:
+
+```bash
+NEXT_PUBLIC_SITE_URL=https://www.your-domain.com
+```
+
+- Set it in your hosting provider's environment variables (or in `.env.production.local`, which is git-ignored) **before running `next build`**. `NEXT_PUBLIC_` values are inlined at build time, so changing it later requires a rebuild.
+- Use the exact origin you want indexed (choose `www` or non-`www`, always `https`), without a trailing slash. A path prefix such as `https://example.com/tools` is supported.
+- If it is not set, every URL falls back to `http://localhost:3000`. That is only suitable for local development, and the production build logs a warning.
+- After deploying, check `https://www.your-domain.com/robots.txt` and `/sitemap.xml`, then submit the sitemap in Google Search Console and Bing Webmaster Tools.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
