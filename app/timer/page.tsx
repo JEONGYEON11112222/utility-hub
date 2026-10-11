@@ -20,7 +20,12 @@ const faqs = [
   {
     question: "Will I hear an alert when the time is up?",
     answer:
-      "If “Play a chime when time is up” is checked, a short chime plays when the countdown reaches zero. Make sure your device is not muted. A completion message also appears on the page. On phones and tablets, the browser may pause the page while the screen is locked, so the chime may not play until you return to it.",
+      "If “Play a chime when time is up” is checked, a short chime plays when the countdown reaches zero. Make sure your device is not muted. A completion message also appears on the page. On phones and tablets, the browser may pause the page while the screen is locked, so the chime may not play until you return to it. While the timer runs, browsers that support it are asked to keep the screen awake, but your device can still turn the screen off, for example in battery saver mode.",
+  },
+  {
+    question: "Can I show the timer in full screen?",
+    answer:
+      "Yes. Press “Full screen” above the countdown to show a large, high-contrast clock that is easy to read from across a room, for example on a TV, projector, or second monitor. Start, Pause, Resume, and Reset stay available, “Edit time” lets you change the countdown without leaving full screen, and the countdown keeps running when you switch in or out. Press “Exit full screen” or the Esc key to return. Some browsers, such as Safari on iPhone, don't support full screen for web pages.",
   },
   {
     question: "What is the longest countdown I can set?",
