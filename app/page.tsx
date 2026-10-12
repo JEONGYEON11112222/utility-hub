@@ -1,20 +1,21 @@
 import Link from "next/link";
+import { CalculatorLinks } from "@/components/calculators/calculator-links";
 import { TimerLinks } from "@/components/timer-links";
 import { pageMetadata } from "@/lib/seo";
 import { toolCategories } from "@/lib/site";
 
 export const metadata = pageMetadata({
   path: "/",
-  title: "Utility Hub: Free Online Timer and Everyday Tools",
+  title: "Utility Hub: Free Online Timer and Calculators",
   description:
-    "Free online tools that work right in your browser. Use an accurate countdown timer now, with everyday calculators and unit converters coming soon.",
+    "Free online tools that work right in your browser: an accurate countdown timer, plus calculators for percentages, discounts, tips, sales tax, fractions, and more.",
   absoluteTitle: true,
 });
 
 const principles = [
   {
     title: "Works in your browser",
-    body: "Tools run on your device. There is nothing to install, and the timer does not send what you enter to a server.",
+    body: "Tools run on your device. There is nothing to install, and the timer and calculators don't send what you enter to a server.",
   },
   {
     title: "No account needed",
@@ -36,15 +37,22 @@ export default function Home() {
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
             Utility Hub collects small, focused tools that do one job well. Time a
-            workout, a meeting, or a study session with our countdown timer, and look
-            out for calculators and unit converters as we add them.
+            workout, a meeting, or a study session with our countdown timer, and work
+            out percentages, tips, discounts, sales tax, and fractions with our
+            calculators. Unit converters are planned.
           </p>
-          <div className="mt-8">
+          <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/timer"
               className="inline-flex min-h-12 items-center rounded-lg bg-accent px-6 text-base font-semibold text-on-accent hover:bg-accent-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               Open the timer
+            </Link>
+            <Link
+              href="/calculator"
+              className="inline-flex min-h-12 items-center rounded-lg border border-border px-6 text-base font-semibold text-foreground hover:bg-muted-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              Open the calculator
             </Link>
           </div>
         </div>
@@ -112,6 +120,16 @@ export default function Home() {
           </p>
           <div className="mt-4">
             <TimerLinks includeCustom />
+          </div>
+        </div>
+
+        <div className="mt-10">
+          <h3 className="text-lg font-semibold text-foreground">Calculators</h3>
+          <p className="mt-1 text-sm text-muted">
+            Everyday math and money calculations, each with worked examples.
+          </p>
+          <div className="mt-4">
+            <CalculatorLinks />
           </div>
         </div>
       </section>

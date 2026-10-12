@@ -30,7 +30,7 @@ export const siteConfig = {
   name: "Utility Hub",
   url: rawSiteUrl ? normalizeSiteUrl(rawSiteUrl) : LOCAL_SITE_URL,
   description:
-    "Free, fast online tools that work in your browser. Start with an accurate countdown timer, with calculators and converters on the way.",
+    "Free, fast online tools that work in your browser: an accurate countdown timer and everyday calculators, with unit converters on the way.",
   locale: "en_US",
 } as const;
 
@@ -56,7 +56,8 @@ export const toolCategories: ToolCategory[] = [
   {
     name: "Calculator",
     summary:
-      "Everyday calculators for quick math, percentages, and common money and date questions.",
+      "Basic and scientific calculators, plus tools for percentages, discounts, tips, sales tax, averages, and fractions.",
+    href: "/calculator",
   },
   {
     name: "Converter",

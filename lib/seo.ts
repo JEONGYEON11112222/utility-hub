@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { calculatorPagePath, calculatorPages } from "@/lib/calculator-pages";
 import { siteConfig } from "@/lib/site";
 import { timerPagePath, timerPages } from "@/lib/timer-pages";
 
@@ -40,4 +41,5 @@ export const indexablePaths: SitePath[] = [
   "/",
   "/timer",
   ...timerPages.map(timerPagePath),
+  ...calculatorPages.map(calculatorPagePath),
 ];

@@ -3,13 +3,14 @@ import { siteConfig } from "@/lib/site";
 
 const navLinks = [
   { href: "/timer", label: "Timer" },
+  { href: "/calculator", label: "Calculators" },
   { href: "/#tools", label: "All tools" },
 ];
 
 export function SiteHeader() {
   return (
     <header className="border-b border-border bg-surface">
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 sm:px-6">
         <Link
           href="/"
           className="flex items-center gap-2 rounded-md text-lg font-semibold tracking-tight text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
