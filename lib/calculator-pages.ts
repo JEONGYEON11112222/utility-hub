@@ -35,22 +35,26 @@ export const calculatorPages: CalculatorPage[] = [
     slug: "calculator",
     name: "Basic Calculator",
     heading: "Basic Calculator",
-    metaTitle: "Basic Online Calculator for Everyday Math",
+    metaTitle: "Basic Calculator: Add, Subtract, Multiply & Divide",
     metaDescription:
-      "A free online calculator for everyday arithmetic. Add, subtract, multiply, and divide with decimals and negative numbers, using buttons or your keyboard.",
+      "Free online basic calculator. Add, subtract, multiply, and divide, including decimals and negative numbers, with the on-screen buttons or your keyboard.",
     intro:
-      "A straightforward calculator for everyday sums. Tap the buttons or type on your keyboard, and chain operations together. Results are shown without the long trailing decimals that computers sometimes produce, so 0.1 + 0.2 shows 0.3.",
+      "Add, subtract, multiply, and divide using the buttons below or your keyboard. Decimals and negative numbers are supported.",
     steps: [
       "Enter a number, choose an operator (+, −, ×, or ÷), then enter the next number.",
-      "Press = to see the result, or press another operator to keep going. Operations are applied in the order you enter them.",
+      "Press = to see the result, or press another operator to keep going. Multiplication (×) and division (÷) are worked out before addition (+) and subtraction (−), and operations at the same level go from left to right.",
       "Use ± to make the current number negative, ⌫ to delete the last digit, and C to start over.",
       "On a keyboard, type digits and + - * /, press Enter or = for the result, Backspace to delete, and Escape to clear.",
     ],
     examples: [
       { title: "Splitting a cost", body: "84 ÷ 4 = 21. Four people sharing an 84 bill each pay 21." },
       {
+        title: "Decimals",
+        body: "12.5 × 4 = 50, and 19.99 + 5.01 = 25. Results skip the tiny rounding errors computers can produce, so 0.1 + 0.2 shows 0.3.",
+      },
+      {
         title: "Chained operations",
-        body: "2 + 3 × 4 entered in that order gives 20, because each step is applied as you go: 2 + 3 = 5, then 5 × 4 = 20. For standard order of operations (which gives 14), use the scientific calculator.",
+        body: "2 + 3 × 4 = 14, because multiplication comes before addition: 3 × 4 = 12, then 2 + 12 = 14. For calculations with parentheses, such as (2 + 3) × 4, use the scientific calculator.",
       },
       { title: "Working with negatives", body: "5 − 8 = −3, and −3 × −2 = 6." },
     ],

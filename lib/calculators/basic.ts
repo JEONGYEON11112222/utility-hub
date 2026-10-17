@@ -1,19 +1,27 @@
-// Basic calculator as a pure reducer: digits, decimal point, + − × ÷, chained operations,
-// sign toggle, backspace, clear, and equals. No eval(); every step is explicit arithmetic.
+// Basic calculator as a pure reducer: digits, decimal point, + − × ÷ with standard order of
+// operations (× and ÷ before + and −, left to right within each level), sign toggle, backspace,
+// clear, and equals. No eval(); every step is explicit arithmetic.
 
 import { cleanNumber, formatCalculatorNumber } from "./format";
 
 export type Operator = "+" | "-" | "*" | "/";
 
+/** A left-hand value waiting for its right-hand operand. */
+type PendingOperation = { value: number; operator: Operator };
+
 export type BasicState = {
-  /** Text in the main display: the number being typed, or the latest result. */
+  /** Text in the main display: the number being typed, or the latest (partial) result. */
   display: string;
-  /** Left-hand value waiting for the next operand. */
-  stored: number | null;
-  operator: Operator | null;
+  /**
+   * Operations not yet applied, oldest first. Each entry's operator binds less tightly than the
+   * one after it, so there are at most two: e.g. 2 + 3 × is [2 +, 3 ×].
+   */
+  pending: PendingOperation[];
   /** True when the next digit should replace the display (after an operator or result). */
   overwrite: boolean;
-  /** Short history line shown above the display, e.g. "12 ×" or "12 × 3 =". */
+  /** Numbers and operator symbols entered since the last result, e.g. ["2", "+", "3", "×"]. */
+  tokens: string[];
+  /** History line shown above the display, e.g. "2 + 3 ×" or "2 + 3 × 4 =". */
   expression: string;
   error: string | null;
 };
@@ -29,9 +37,9 @@ export type BasicAction =
 
 export const initialBasicState: BasicState = {
   display: "0",
-  stored: null,
-  operator: null,
+  pending: [],
   overwrite: false,
+  tokens: [],
   expression: "",
   error: null,
 };
@@ -50,6 +58,43 @@ export function applyOperator(left: number, operator: Operator, right: number): 
     operator === "+" ? left + right : operator === "-" ? left - right : operator === "*" ? left * right : left / right;
   if (!Number.isFinite(raw)) return { ok: false, error: "Result is too large" };
   return { ok: true, value: cleanNumber(raw) };
+}
+
+function precedence(operator: Operator): number {
+  return operator === "*" || operator === "/" ? 2 : 1;
+}
+
+/**
+ * Applies pending operations from the newest back, while they bind at least as tightly as
+ * `minPrecedence`, using `value` as the right-hand operand of the newest one.
+ */
+function collapse(
+  pending: PendingOperation[],
+  value: number,
+  minPrecedence: number,
+): { ok: true; pending: PendingOperation[]; value: number } | { ok: false; error: string } {
+  const rest = [...pending];
+  let result = value;
+  while (rest.length > 0 && precedence(rest[rest.length - 1].operator) >= minPrecedence) {
+    const { value: left, operator } = rest.pop()!;
+    const outcome = applyOperator(left, operator, result);
+    if (!outcome.ok) return outcome;
+    result = outcome.value;
+  }
+  return { ok: true, pending: rest, value: result };
+}
+
+/** Longest history line kept before older tokens are dropped, so the latest input stays visible. */
+const MAX_EXPRESSION_LENGTH = 32;
+
+function formatExpression(tokens: string[]): string {
+  // Tokens alternate number, operator, so dropping two at a time keeps a number first.
+  let start = 0;
+  while (start + 2 < tokens.length && tokens.slice(start).join(" ").length > MAX_EXPRESSION_LENGTH) {
+    start += 2;
+  }
+  const text = tokens.slice(start).join(" ");
+  return start > 0 ? `… ${text}` : text;
 }
 
 function displayValue(display: string): number {
@@ -89,43 +134,47 @@ export function basicReducer(state: BasicState, action: BasicAction): BasicState
     }
 
     case "operator": {
-      const current = displayValue(state.display);
-      // Pressing another operator straight after one just replaces it.
-      if (state.operator && state.overwrite && state.stored !== null) {
-        return {
-          ...state,
-          operator: action.operator,
-          expression: `${formatCalculatorNumber(state.stored)} ${operatorSymbols[action.operator]}`,
-        };
+      const symbol = operatorSymbols[action.operator];
+      let pending: PendingOperation[];
+      let operand: number;
+      let tokens: string[];
+      if (state.pending.length > 0 && state.overwrite) {
+        // Pressing another operator straight after one replaces it. The last pending value is
+        // the operand again, so 2 + 3 × then + gives 2 + 3 +.
+        const last = state.pending[state.pending.length - 1];
+        pending = state.pending.slice(0, -1);
+        operand = last.value;
+        tokens = [...state.tokens.slice(0, -1), symbol];
+      } else {
+        // After a result the history starts again from the displayed number.
+        operand = displayValue(state.display);
+        pending = state.pending;
+        tokens = [...(pending.length > 0 ? state.tokens : []), formatCalculatorNumber(operand), symbol];
       }
-      let left = current;
-      if (state.operator && state.stored !== null) {
-        const result = applyOperator(state.stored, state.operator, current);
-        if (!result.ok) return errorState(result.error);
-        left = result.value;
-      }
-      const shown = formatCalculatorNumber(left);
+      // Apply everything that binds at least as tightly as the new operator, left to right.
+      const collapsed = collapse(pending, operand, precedence(action.operator));
+      if (!collapsed.ok) return errorState(collapsed.error);
       return {
-        display: shown,
-        stored: left,
-        operator: action.operator,
+        display: formatCalculatorNumber(collapsed.value),
+        pending: [...collapsed.pending, { value: collapsed.value, operator: action.operator }],
         overwrite: true,
-        expression: `${shown} ${operatorSymbols[action.operator]}`,
+        tokens,
+        expression: formatExpression(tokens),
         error: null,
       };
     }
 
     case "equals": {
-      if (!state.operator || state.stored === null) return state;
+      if (state.pending.length === 0) return state;
       const right = displayValue(state.display);
-      const result = applyOperator(state.stored, state.operator, right);
+      const result = collapse(state.pending, right, 0);
       if (!result.ok) return errorState(result.error);
       return {
         display: formatCalculatorNumber(result.value),
-        stored: null,
-        operator: null,
+        pending: [],
         overwrite: true,
-        expression: `${formatCalculatorNumber(state.stored)} ${operatorSymbols[state.operator]} ${formatCalculatorNumber(right)} =`,
+        tokens: [],
+        expression: formatExpression([...state.tokens, formatCalculatorNumber(right), "="]),
         error: null,
       };
     }
