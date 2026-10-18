@@ -190,6 +190,11 @@ export function basicReducer(state: BasicState, action: BasicAction): BasicState
     }
 
     case "toggleSign": {
+      if (state.overwrite && state.entries.length > 0) {
+        // Straight after an operator the display only repeats the last number, so ± starts the
+        // next number as a negative one instead of flipping that copy: 3 × ± 2 is 3 × -2.
+        return { ...state, display: "-0", overwrite: false };
+      }
       if (state.display === "0" || state.display === "0.") {
         // Lets users start typing a negative number: ± then digits.
         return { ...state, display: `-${state.display}`, overwrite: false };
