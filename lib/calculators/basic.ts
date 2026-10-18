@@ -1,26 +1,28 @@
 // Basic calculator as a pure reducer: digits, decimal point, + − × ÷ with standard order of
 // operations (× and ÷ before + and −, left to right within each level), sign toggle, backspace,
-// clear, and equals. No eval(); every step is explicit arithmetic.
+// clear, and equals. The expression is only evaluated on equals. No eval(); every step is
+// explicit arithmetic.
 
 import { cleanNumber, formatCalculatorNumber } from "./format";
 
 export type Operator = "+" | "-" | "*" | "/";
 
-/** A left-hand value waiting for its right-hand operand. */
+/** A number the user finished entering, followed by the operator typed after it. */
+type Entry = { value: string; operator: Operator };
+
+/** A left-hand value waiting for its right-hand operand during evaluation. */
 type PendingOperation = { value: number; operator: Operator };
 
 export type BasicState = {
-  /** Text in the main display: the number being typed, or the latest (partial) result. */
+  /** Text in the main display: the number being typed, or the latest result. */
   display: string;
+  /** The expression entered so far, oldest first: 2 + 3 × is [2 +, 3 ×]. */
+  entries: Entry[];
   /**
-   * Operations not yet applied, oldest first. Each entry's operator binds less tightly than the
-   * one after it, so there are at most two: e.g. 2 + 3 × is [2 +, 3 ×].
+   * True when the next digit should replace the display: straight after an operator (the
+   * display then repeats the last entry's number) or after a result.
    */
-  pending: PendingOperation[];
-  /** True when the next digit should replace the display (after an operator or result). */
   overwrite: boolean;
-  /** Numbers and operator symbols entered since the last result, e.g. ["2", "+", "3", "×"]. */
-  tokens: string[];
   /** History line shown above the display, e.g. "2 + 3 ×" or "2 + 3 × 4 =". */
   expression: string;
   error: string | null;
@@ -37,9 +39,8 @@ export type BasicAction =
 
 export const initialBasicState: BasicState = {
   display: "0",
-  pending: [],
+  entries: [],
   overwrite: false,
-  tokens: [],
   expression: "",
   error: null,
 };
@@ -82,6 +83,22 @@ function collapse(
     result = outcome.value;
   }
   return { ok: true, pending: rest, value: result };
+}
+
+/** Evaluates the entries followed by `last`, multiplying and dividing before adding and subtracting. */
+function evaluate(entries: Entry[], last: number): Outcome {
+  let pending: PendingOperation[] = [];
+  for (const entry of entries) {
+    const collapsed = collapse(pending, Number(entry.value), precedence(entry.operator));
+    if (!collapsed.ok) return collapsed;
+    pending = [...collapsed.pending, { value: collapsed.value, operator: entry.operator }];
+  }
+  const result = collapse(pending, last, 0);
+  return result.ok ? { ok: true, value: result.value } : result;
+}
+
+function entryTokens(entries: Entry[]): string[] {
+  return entries.flatMap((entry) => [entry.value, operatorSymbols[entry.operator]]);
 }
 
 /** Longest history line kept before older tokens are dropped, so the latest input stays visible. */
@@ -134,47 +151,40 @@ export function basicReducer(state: BasicState, action: BasicAction): BasicState
     }
 
     case "operator": {
-      const symbol = operatorSymbols[action.operator];
-      let pending: PendingOperation[];
-      let operand: number;
-      let tokens: string[];
-      if (state.pending.length > 0 && state.overwrite) {
-        // Pressing another operator straight after one replaces it. The last pending value is
-        // the operand again, so 2 + 3 × then + gives 2 + 3 +.
-        const last = state.pending[state.pending.length - 1];
-        pending = state.pending.slice(0, -1);
-        operand = last.value;
-        tokens = [...state.tokens.slice(0, -1), symbol];
+      let entries: Entry[];
+      if (state.entries.length > 0 && state.overwrite) {
+        // Pressing another operator straight after one replaces it: 2 + 3 × then + gives 2 + 3 +.
+        const last = state.entries[state.entries.length - 1];
+        entries = [...state.entries.slice(0, -1), { ...last, operator: action.operator }];
       } else {
-        // After a result the history starts again from the displayed number.
-        operand = displayValue(state.display);
-        pending = state.pending;
-        tokens = [...(pending.length > 0 ? state.tokens : []), formatCalculatorNumber(operand), symbol];
+        // After a result the entries are empty, so the expression starts from the displayed number.
+        const value = formatCalculatorNumber(displayValue(state.display));
+        entries = [...state.entries, { value, operator: action.operator }];
       }
-      // Apply everything that binds at least as tightly as the new operator, left to right.
-      const collapsed = collapse(pending, operand, precedence(action.operator));
-      if (!collapsed.ok) return errorState(collapsed.error);
+      const last = entries[entries.length - 1];
       return {
-        display: formatCalculatorNumber(collapsed.value),
-        pending: [...collapsed.pending, { value: collapsed.value, operator: action.operator }],
+        display: last.value,
+        entries,
         overwrite: true,
-        tokens,
-        expression: formatExpression(tokens),
+        expression: formatExpression(entryTokens(entries)),
         error: null,
       };
     }
 
     case "equals": {
-      if (state.pending.length === 0) return state;
+      if (state.entries.length === 0) return state;
       const right = displayValue(state.display);
-      const result = collapse(state.pending, right, 0);
+      const result = evaluate(state.entries, right);
       if (!result.ok) return errorState(result.error);
       return {
         display: formatCalculatorNumber(result.value),
-        pending: [],
+        entries: [],
         overwrite: true,
-        tokens: [],
-        expression: formatExpression([...state.tokens, formatCalculatorNumber(right), "="]),
+        expression: formatExpression([
+          ...entryTokens(state.entries),
+          formatCalculatorNumber(right),
+          "=",
+        ]),
         error: null,
       };
     }
@@ -189,11 +199,29 @@ export function basicReducer(state: BasicState, action: BasicAction): BasicState
     }
 
     case "backspace": {
-      // A result or operator boundary is not edited digit by digit.
-      if (state.overwrite) return state;
-      const shortened = state.display.slice(0, -1);
-      const display = shortened === "" || shortened === "-" ? "0" : shortened;
-      return { ...state, display };
+      if (state.overwrite) {
+        // A result is not edited digit by digit.
+        if (state.entries.length === 0) return state;
+        // Straight after an operator: remove it, and the number before it can be edited again.
+        const entries = state.entries.slice(0, -1);
+        const removed = state.entries[state.entries.length - 1];
+        return {
+          ...state,
+          display: removed.value,
+          entries,
+          overwrite: false,
+          expression: formatExpression(entryTokens(entries)),
+        };
+      }
+      // Exponent notation such as 1.5e+20 is cleared as a whole rather than cut into another number.
+      const shortened = state.display.includes("e") ? "" : state.display.slice(0, -1);
+      if (shortened !== "" && shortened !== "-") return { ...state, display: shortened };
+      // The number is now empty. With an operator before it, go back to the state right after
+      // that operator was pressed, so the next Backspace removes the operator.
+      if (state.entries.length > 0) {
+        return { ...state, display: state.entries[state.entries.length - 1].value, overwrite: true };
+      }
+      return { ...state, display: "0" };
     }
 
     case "clear":

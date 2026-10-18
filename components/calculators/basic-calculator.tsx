@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import { cardClass, focusRing } from "@/components/calculators/fields";
 import {
   basicReducer,
@@ -70,14 +70,24 @@ const keyStyles: Record<Key["kind"], string> = {
 export function BasicCalculator() {
   const [state, dispatch] = useReducer(basicReducer, initialBasicState);
 
-  // Keyboard support anywhere on the page, except while typing in a form field. When a key
-  // button has focus, Enter and Space already "click" it, so they are left to the browser.
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Keyboard support anywhere on the page, except while typing in a form field. Enter on a
+  // focused link or button outside the calculator is left to the browser. Inside the calculator,
+  // Enter always means "=", and preventDefault stops it from also clicking the focused key
+  // (Space still activates the focused key).
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
       const target = event.target as HTMLElement | null;
       if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
-      if ((event.key === "Enter" || event.key === " ") && target?.closest("button, a")) return;
+      if (
+        event.key === "Enter" &&
+        target?.closest("button, a, summary") &&
+        !rootRef.current?.contains(target)
+      ) {
+        return;
+      }
       const action = keyToAction(event.key);
       if (!action) return;
       event.preventDefault();
@@ -95,7 +105,7 @@ export function BasicCalculator() {
       : "";
 
   return (
-    <div className={`${cardClass} max-w-sm`}>
+    <div ref={rootRef} className={`${cardClass} max-w-sm`}>
       <div className="rounded-xl bg-muted-surface px-4 py-3 text-right">
         <p className="min-h-6 truncate text-sm text-muted" aria-hidden="true">
           {state.expression || " "}
