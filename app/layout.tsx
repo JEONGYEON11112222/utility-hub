@@ -18,14 +18,23 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
+  // No " | Utility Hub" suffix: Google shows the site name separately above each result (from
+  // the WebSite structured data on the home page), and the suffix pushed most tool titles past
+  // the ~60 characters shown in results. Pages that need the name include it themselves.
   title: {
     default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
+    template: "%s",
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
+  // Allow large image previews and full-length snippets in search results and Discover.
+  robots: {
+    googleBot: { "max-image-preview": "large", "max-snippet": -1 },
+  },
   // Fallback for routes without page metadata (e.g. 404). Pages use pageMetadata() from lib/seo.
   openGraph: baseOpenGraph,
+  // Large preview card on X and apps that read Twitter tags; the image comes from Open Graph.
+  twitter: { card: "summary_large_image" },
   // Google Search Console ownership (HTML tag method). This token is public by design.
   verification: {
     google: "LYFHxobkj7gIewcYc1MiuVMf-C3hy4HY9T8VyLdUtk4",

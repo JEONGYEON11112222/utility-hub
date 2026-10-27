@@ -2,13 +2,21 @@ import Link from "next/link";
 import { CalculatorLinks } from "@/components/calculators/calculator-links";
 import { TimerLinks } from "@/components/timer-links";
 import { pageMetadata } from "@/lib/seo";
-import { toolCategories } from "@/lib/site";
+import { absoluteUrl, siteConfig, toolCategories } from "@/lib/site";
+
+// Tells Google the site's name so it can show "Utility Hub" above each search result.
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteConfig.name,
+  url: absoluteUrl("/"),
+};
 
 export const metadata = pageMetadata({
   path: "/",
   title: "Utility Hub: Free Online Timer and Calculators",
   description:
-    "Free online tools that work right in your browser: an accurate countdown timer, plus calculators for percentages, discounts, tips, sales tax, fractions, and more.",
+    "Free tools that work right in your browser: an accurate countdown timer, plus calculators for percentages, discounts, tips, sales tax, fractions, and more.",
   absoluteTitle: true,
 });
 
@@ -30,6 +38,10 @@ const principles = [
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd).replace(/</g, "\\u003c") }}
+      />
       <section className="border-b border-border bg-surface">
         <div className="mx-auto w-full max-w-5xl px-4 py-14 sm:px-6 sm:py-20">
           <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-balance text-foreground sm:text-5xl">

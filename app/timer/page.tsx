@@ -6,7 +6,7 @@ const title = "Online Countdown Timer";
 
 export const metadata = pageMetadata({
   path: "/timer",
-  title,
+  title: "Online Countdown Timer: Free Timer with Alarm Sound",
   description:
     "Set a countdown in minutes and seconds, then start, pause, resume, or reset it. Stays accurate in background tabs and can play a chime when time is up.",
 });

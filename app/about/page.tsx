@@ -5,7 +5,7 @@ export const metadata = pageMetadata({
   path: "/about",
   title: "About Utility Hub",
   description:
-    "What Utility Hub is, how its timer and calculators are built and checked, and how to report a problem with a tool.",
+    "What Utility Hub is, how its free timer and calculators are built and checked for accuracy, and how it handles your privacy.",
 });
 
 const linkClass =

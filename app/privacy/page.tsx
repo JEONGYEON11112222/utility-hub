@@ -2,7 +2,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   path: "/privacy",
-  title: "Privacy Policy",
+  title: "Utility Hub Privacy Policy",
   description:
     "How Utility Hub handles your data: the tools run in your browser, with no accounts, cookies, or analytics.",
 });
