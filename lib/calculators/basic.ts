@@ -124,6 +124,14 @@ function errorState(error: string): BasicState {
   return { ...initialBasicState, display: "Error", error };
 }
 
+/**
+ * The history line to keep when the display changes. Straight after a result, editing the
+ * number starts a new calculation, so "2 + 3 =" no longer describes what is shown.
+ */
+function keptExpression(state: BasicState): string {
+  return state.overwrite && state.entries.length === 0 ? "" : state.expression;
+}
+
 export function basicReducer(state: BasicState, action: BasicAction): BasicState {
   // After an error, any input starts fresh; operators and equals are ignored until then.
   if (state.error) {
@@ -137,7 +145,9 @@ export function basicReducer(state: BasicState, action: BasicAction): BasicState
   switch (action.type) {
     case "digit": {
       if (!/^\d$/.test(action.digit)) return state;
-      if (state.overwrite) return { ...state, display: action.digit, overwrite: false };
+      if (state.overwrite) {
+        return { ...state, display: action.digit, overwrite: false, expression: keptExpression(state) };
+      }
       if (state.display === "0") return { ...state, display: action.digit };
       if (state.display === "-0") return { ...state, display: `-${action.digit}` };
       if (state.display.replace(/\D/g, "").length >= MAX_DIGITS) return state;
@@ -145,7 +155,9 @@ export function basicReducer(state: BasicState, action: BasicAction): BasicState
     }
 
     case "decimal": {
-      if (state.overwrite) return { ...state, display: "0.", overwrite: false };
+      if (state.overwrite) {
+        return { ...state, display: "0.", overwrite: false, expression: keptExpression(state) };
+      }
       if (state.display.includes(".")) return state;
       return { ...state, display: `${state.display}.` };
     }
@@ -197,10 +209,10 @@ export function basicReducer(state: BasicState, action: BasicAction): BasicState
       }
       if (state.display === "0" || state.display === "0.") {
         // Lets users start typing a negative number: ± then digits.
-        return { ...state, display: `-${state.display}`, overwrite: false };
+        return { ...state, display: `-${state.display}`, overwrite: false, expression: keptExpression(state) };
       }
       const toggled = state.display.startsWith("-") ? state.display.slice(1) : `-${state.display}`;
-      return { ...state, display: toggled };
+      return { ...state, display: toggled, expression: keptExpression(state) };
     }
 
     case "backspace": {
