@@ -152,7 +152,7 @@ export const calculatorPages: CalculatorPage[] = [
     heading: "Sales Tax Calculator",
     metaTitle: "Sales Tax Calculator: Add or Remove Tax from a Price",
     metaDescription:
-      "Add sales tax to a price, or work out the price before tax from a tax-inclusive total. Enter the tax rate that applies to you.",
+      "Add sales tax to a price, or work out the price before tax from a tax-inclusive total. Includes how to calculate sales tax by hand and find the rate from a receipt.",
     intro:
       "Add tax to a pre-tax price, or work backwards from a total that already includes tax. You enter the rate yourself, because sales tax, VAT, and GST rates depend on where you are and what you are buying.",
     steps: [
@@ -162,7 +162,15 @@ export const calculatorPages: CalculatorPage[] = [
     ],
     examples: [
       { title: "Adding tax", body: "100 at a tax rate of 8.25% has 8.25 of tax, for a total of 108.25." },
+      {
+        title: "How to add sales tax to a price by hand",
+        body: "Turn the rate into a decimal (8.25% is 0.0825) and multiply it by the price to get the tax: 105 × 0.0825 = 8.66. Add that to the price for the total: 105 + 8.66 = 113.66. In one step, multiply by 1 plus the rate: 105 × 1.0825 = 113.66.",
+      },
       { title: "Removing tax", body: "A 115 total that includes 15% tax was 100 before tax, with 15 of tax." },
+      {
+        title: "Finding the tax rate from a receipt",
+        body: "Divide the tax by the price before tax and multiply by 100. A receipt showing 4.50 of tax on a 60.00 purchase has a rate of 4.50 ÷ 60 × 100 = 7.5%.",
+      },
       {
         title: "Why you can't just subtract the rate",
         body: "Taking 15% off 115 gives 97.75, not 100, because the tax was 15% of the pre-tax price, not of the total. Removing tax divides by 1.15 instead.",
@@ -170,7 +178,9 @@ export const calculatorPages: CalculatorPage[] = [
     ],
     notes: [
       "This calculator does not know your local tax rate and is not tax advice. Check the rate with your local tax authority or on your receipt.",
-      "Amounts are rounded to 2 decimal places for display; businesses may round tax line by line.",
+      "In the US, sales tax is set by states, counties, and cities, so the combined rate depends on where you buy. Prices are usually shown before tax.",
+      "Outside the US, prices usually already include tax, so use Remove tax to see the pre-tax amount. The standard rates are 20% VAT in the UK and 10% GST in Australia. Canada adds 5% GST, plus provincial sales tax or a combined HST in most provinces.",
+      "Amounts are rounded to the cent, and the parts always add up to the total. Businesses may round tax line by line, so a receipt can differ by a cent. You can type amounts with a $, £, or € sign and the rate with a % sign.",
     ],
     related: ["discount-calculator", "percentage-calculator", "tip-calculator"],
   },
