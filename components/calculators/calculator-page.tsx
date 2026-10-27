@@ -126,6 +126,20 @@ export function CalculatorPage({ slug, children }: { slug: CalculatorSlug; child
             </ul>
           </section>
         )}
+
+        <section aria-labelledby="faq-heading">
+          <h2 id="faq-heading" className="text-xl font-semibold tracking-tight text-foreground">
+            Frequently asked questions
+          </h2>
+          <div className="mt-4 divide-y divide-border border-y border-border">
+            {page.faqs.map((faq) => (
+              <div key={faq.question} className="py-5">
+                <h3 className="font-semibold text-foreground">{faq.question}</h3>
+                <p className="mt-2 leading-7 text-muted">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
 
       <section aria-labelledby="more-calculators-heading" className="mt-14">
