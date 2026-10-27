@@ -192,7 +192,7 @@ export const calculatorPages: CalculatorPage[] = [
       { title: "Including negatives", body: "The average of -4, 2, and 8 is 2, because the sum is 6 and 6 ÷ 3 = 2." },
     ],
     notes: [
-      "Because commas separate numbers, don't use thousands separators: write 1500, not 1,500. Use a period for decimals.",
+      "Thousands separators work when numbers are separated by spaces, new lines, or a comma and a space: 1,500, 2,000 averages to 1,750. If you use commas with no spaces, every comma separates numbers, so 1,500,2,000 is read as 1, 500, 2, and 0. Use a period for decimals.",
       "This is the arithmetic mean. It does not calculate the median, mode, or a weighted average.",
     ],
     related: ["percentage-calculator", "calculator", "scientific-calculator"],

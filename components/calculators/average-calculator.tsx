@@ -13,8 +13,17 @@ export function AverageCalculator() {
   const parsed = parseNumberList(text);
   const stats = parsed.tooMany ? null : summarize(parsed.numbers);
   const invalidCount = parsed.invalid.length;
+  const invalidHasComma = parsed.invalid.some((token) => token.includes(","));
   const errorId = `${id}-invalid`;
   const hintId = `${id}-hint`;
+  const commaNoteId = `${id}-commas`;
+  const describedBy = [
+    hintId,
+    invalidCount > 0 ? errorId : null,
+    parsed.ambiguousCommas ? commaNoteId : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className={cardClass}>
@@ -28,18 +37,27 @@ export function AverageCalculator() {
         onChange={(event) => setText(event.target.value)}
         spellCheck={false}
         placeholder={"e.g. 72, 85, 90, 93"}
-        aria-describedby={invalidCount > 0 ? `${hintId} ${errorId}` : hintId}
+        aria-describedby={describedBy}
         aria-invalid={invalidCount > 0 ? true : undefined}
         className={`w-full rounded-lg border border-border bg-surface px-3 py-2.5 font-mono text-base text-foreground placeholder:text-muted/70 aria-invalid:border-danger ${focusRing}`}
       />
       <p id={hintId} className="mt-1 text-xs text-muted">
         Separate numbers with commas, spaces, semicolons, or new lines. Use a period for decimals.
+        Thousands separators like 1,500 work when numbers are separated by spaces or new lines.
       </p>
       {invalidCount > 0 && (
         <p id={errorId} className="mt-2 text-sm font-medium text-danger">
           {invalidCount === 1 ? "1 entry isn't a number and was left out" : `${invalidCount} entries aren't numbers and were left out`}:{" "}
           {parsed.invalid.slice(0, MAX_LISTED_INVALID).map((token) => `“${token}”`).join(", ")}
           {invalidCount > MAX_LISTED_INVALID ? ", …" : ""}
+          {invalidHasComma ? ". Use a period for decimals, and a comma only between thousands, as in 1,500." : ""}
+        </p>
+      )}
+      {parsed.ambiguousCommas && (
+        <p id={commaNoteId} className="mt-2 text-sm font-medium text-foreground">
+          Every comma was read as a separator, so 1,500 counts as two numbers, 1 and 500. To
+          enter numbers with thousands separators, put a space after each separating comma:
+          1,500, 2,000.
         </p>
       )}
 
