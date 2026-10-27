@@ -30,8 +30,8 @@ export function CalculatorPage({ slug, children }: { slug: CalculatorSlug; child
   const isHub = slug === "calculator";
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted">
+    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-14">
+      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted sm:mb-6">
         <ol className="flex flex-wrap items-center gap-1.5">
           <li>
             <Link href="/" className={crumbLinkClass}>
@@ -59,10 +59,10 @@ export function CalculatorPage({ slug, children }: { slug: CalculatorSlug; child
         <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
           {page.heading}
         </h1>
-        <p className="mt-4 text-lg leading-8 text-muted">{page.intro}</p>
+        <p className="mt-3 text-base leading-7 text-muted sm:mt-4 sm:text-lg sm:leading-8">{page.intro}</p>
       </div>
 
-      <section aria-label={page.name} className="mt-8 max-w-3xl">
+      <section aria-label={page.name} className="mt-6 max-w-3xl sm:mt-8">
         {children}
       </section>
 

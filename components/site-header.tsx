@@ -1,16 +1,17 @@
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 
+// "All tools" is hidden on phones so the header fits on one line; the logo links home too.
 const navLinks = [
   { href: "/timer", label: "Timer" },
   { href: "/calculator", label: "Calculators" },
-  { href: "/#tools", label: "All tools" },
+  { href: "/#tools", label: "All tools", hideOnPhones: true },
 ];
 
 export function SiteHeader() {
   return (
     <header className="border-b border-border bg-surface">
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 sm:px-6">
+      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:px-6 sm:py-4">
         <Link
           href="/"
           className="flex items-center gap-2 rounded-md text-lg font-semibold tracking-tight text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
@@ -26,10 +27,10 @@ export function SiteHeader() {
         <nav aria-label="Main">
           <ul className="flex items-center gap-1 sm:gap-2">
             {navLinks.map((link) => (
-              <li key={link.href}>
+              <li key={link.href} className={link.hideOnPhones ? "hidden sm:block" : undefined}>
                 <Link
                   href={link.href}
-                  className="inline-flex min-h-10 items-center rounded-md px-3 text-sm font-medium text-muted hover:bg-muted-surface hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className="inline-flex min-h-10 items-center rounded-md px-2 text-sm sm:px-3 font-medium text-muted hover:bg-muted-surface hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                 >
                   {link.label}
                 </Link>
