@@ -19,8 +19,8 @@ export function SalesTaxCalculator() {
   const [amount, setAmount] = useState("");
   const [rate, setRate] = useState("");
   const amountLabel = mode === "add" ? "Price before tax" : "Total including tax";
-  const a = readField(amount, { label: `The ${amountLabel.toLowerCase()}`, min: 0 });
-  const r = readField(rate, { label: "The tax rate", min: 0, max: 100 });
+  const a = readField(amount, { label: `The ${amountLabel.toLowerCase()}`, min: 0, unit: "money" });
+  const r = readField(rate, { label: "The tax rate", min: 0, max: 100, unit: "percent" });
   const result =
     a.status === "ok" && r.status === "ok"
       ? mode === "add"

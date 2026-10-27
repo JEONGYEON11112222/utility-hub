@@ -10,8 +10,8 @@ export function DiscountCalculator() {
   const id = useId();
   const [price, setPrice] = useState("");
   const [percent, setPercent] = useState("");
-  const p = readField(price, { label: "The original price", min: 0 });
-  const d = readField(percent, { label: "The discount", min: 0, max: 100 });
+  const p = readField(price, { label: "The original price", min: 0, unit: "money" });
+  const d = readField(percent, { label: "The discount", min: 0, max: 100, unit: "percent" });
   const result = p.status === "ok" && d.status === "ok" ? calculateDiscount(p.value, d.value) : null;
 
   return (

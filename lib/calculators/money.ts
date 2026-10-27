@@ -1,15 +1,22 @@
 // Discount, tip, and sales tax math. Inputs are validated by the UI with readField(); these
 // functions assume valid ranges and return values cleaned of floating-point artifacts.
 // Amounts are plain numbers with no currency: the UI shows them with 2 decimals.
+// Discount and sales tax results are rounded to the cent here; tip results are not yet.
 
 import { cleanNumber, roundTo } from "./format";
 
+/** Rounds to the cent. Results that are shown together are each derived from rounded parts,
+ * so the parts always add up to the shown total (5.00 + 5.01 = 10.01, never 10.02). */
+function toCents(value: number): number {
+  return roundTo(cleanNumber(value), 2);
+}
+
 export type DiscountResult = { discount: number; finalPrice: number };
 
-/** Price after a percentage discount (0–100%). */
+/** Price after a percentage discount (0–100%), rounded to the cent. */
 export function calculateDiscount(price: number, discountPercent: number): DiscountResult {
-  const discount = cleanNumber((price * discountPercent) / 100);
-  return { discount, finalPrice: cleanNumber(price - discount) };
+  const discount = toCents((price * discountPercent) / 100);
+  return { discount, finalPrice: cleanNumber(toCents(price) - discount) };
 }
 
 export type TipResult = {
@@ -41,14 +48,16 @@ export function splitRoundingDifference(total: number, people: number): number {
 
 export type SalesTaxResult = { preTax: number; tax: number; total: number };
 
-/** Adds tax at `ratePercent` to a pre-tax price. */
+/** Adds tax at `ratePercent` to a pre-tax price, rounded to the cent. */
 export function addSalesTax(preTax: number, ratePercent: number): SalesTaxResult {
-  const tax = cleanNumber((preTax * ratePercent) / 100);
-  return { preTax: cleanNumber(preTax), tax, total: cleanNumber(preTax + tax) };
+  const price = toCents(preTax);
+  const tax = toCents((preTax * ratePercent) / 100);
+  return { preTax: price, tax, total: cleanNumber(price + tax) };
 }
 
-/** Works back from a tax-inclusive total: pre-tax = total ÷ (1 + rate). */
+/** Works back from a tax-inclusive total: pre-tax = total ÷ (1 + rate), rounded to the cent. */
 export function removeSalesTax(total: number, ratePercent: number): SalesTaxResult {
-  const preTax = cleanNumber(total / (1 + ratePercent / 100));
-  return { preTax, tax: cleanNumber(total - preTax), total: cleanNumber(total) };
+  const totalCents = toCents(total);
+  const preTax = toCents(total / (1 + ratePercent / 100));
+  return { preTax, tax: cleanNumber(totalCents - preTax), total: totalCents };
 }

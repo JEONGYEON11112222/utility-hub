@@ -114,7 +114,8 @@ export const calculatorPages: CalculatorPage[] = [
       },
     ],
     notes: [
-      "Amounts are rounded to 2 decimal places for display. Stores may round differently, and sales tax is not included.",
+      "Amounts are rounded to the cent, and the final price is the original price minus the rounded saving, so the two always add up. Stores may round differently, and sales tax is not included.",
+      "You can type prices with a $, £, or € sign and the discount with a % sign.",
     ],
     related: ["percentage-calculator", "sales-tax-calculator", "tip-calculator"],
   },

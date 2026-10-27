@@ -31,7 +31,22 @@ type FieldRules = {
   /** Reject a value equal to `min` (for "must be greater than" rules). */
   minExclusive?: boolean;
   integer?: boolean;
+  /**
+   * Lets people type the symbol they see on a price tag or receipt: "money" accepts a leading
+   * $, £, or € (as in $19.99), and "percent" accepts a trailing % (as in 8.25%).
+   */
+  unit?: "money" | "percent";
 };
+
+const CURRENCY_PREFIX = /^([+-]?)\s*[$£€]\s*/;
+const PERCENT_SUFFIX = /\s*%$/;
+
+function stripUnit(text: string, unit: FieldRules["unit"]): string {
+  const trimmed = text.trim();
+  if (unit === "money") return trimmed.replace(CURRENCY_PREFIX, "$1");
+  if (unit === "percent") return trimmed.replace(PERCENT_SUFFIX, "");
+  return trimmed;
+}
 
 function describeLimit(value: number): string {
   return formatNumber(value);
@@ -40,8 +55,8 @@ function describeLimit(value: number): string {
 /** Validates a field's text against simple range rules and returns a user-facing error. */
 export function readField(text: string, rules: FieldRules): FieldResult {
   if (text.trim() === "") return { status: "empty" };
-  const value = parseNumber(text);
-  const { label, min, max, minExclusive = false, integer = false } = rules;
+  const { label, min, max, minExclusive = false, integer = false, unit } = rules;
+  const value = parseNumber(stripUnit(text, unit));
   if (value === null) {
     return { status: "invalid", error: `${label} must be a number, like 12 or 12.5.` };
   }

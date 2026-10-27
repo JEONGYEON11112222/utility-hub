@@ -12,7 +12,7 @@ function PercentOfCard() {
   const id = useId();
   const [percent, setPercent] = useState("");
   const [total, setTotal] = useState("");
-  const p = readField(percent, { label: "The percentage" });
+  const p = readField(percent, { label: "The percentage", unit: "percent" });
   const t = readField(total, { label: "The number" });
   const result = p.status === "ok" && t.status === "ok" ? percentOf(p.value, t.value) : null;
 

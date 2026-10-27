@@ -13,8 +13,8 @@ export function TipCalculator() {
   const [bill, setBill] = useState("");
   const [tip, setTip] = useState("15");
   const [people, setPeople] = useState("1");
-  const b = readField(bill, { label: "The bill", min: 0 });
-  const t = readField(tip, { label: "The tip", min: 0, max: 100 });
+  const b = readField(bill, { label: "The bill", min: 0, unit: "money" });
+  const t = readField(tip, { label: "The tip", min: 0, max: 100, unit: "percent" });
   const n = readField(people, { label: "The number of people", min: 1, max: 100, integer: true });
   const result =
     b.status === "ok" && t.status === "ok" && n.status === "ok" ? calculateTip(b.value, t.value, n.value) : null;
