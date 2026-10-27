@@ -12,6 +12,21 @@ export function SiteFooter() {
           <p className="mt-2 max-w-sm text-sm leading-6 text-muted">
             Simple online tools that run in your browser. No account or download needed.
           </p>
+          <ul className="mt-3 flex gap-4 text-sm">
+            {[
+              { href: "/about", label: "About" },
+              { href: "/privacy", label: "Privacy" },
+            ].map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="rounded text-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
         <nav aria-label="Tools">
           <p className="font-semibold text-foreground">Tools</p>

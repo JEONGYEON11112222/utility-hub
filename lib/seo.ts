@@ -42,4 +42,6 @@ export const indexablePaths: SitePath[] = [
   "/timer",
   ...timerPages.map(timerPagePath),
   ...calculatorPages.map(calculatorPagePath),
+  "/about",
+  "/privacy",
 ];
