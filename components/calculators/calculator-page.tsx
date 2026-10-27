@@ -8,6 +8,7 @@ import {
   type CalculatorSlug,
 } from "@/lib/calculator-pages";
 import { pageMetadata } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/site";
 
 export function calculatorPageMetadata(slug: CalculatorSlug): Metadata {
   const page = getCalculatorPage(slug);
@@ -29,8 +30,29 @@ export function CalculatorPage({ slug, children }: { slug: CalculatorSlug; child
   const page = getCalculatorPage(slug);
   const isHub = slug === "calculator";
 
+  // Structured data for the visible breadcrumb trail below, built from the same items.
+  const crumbs = [
+    { name: "Home", path: "/" as const },
+    ...(isHub ? [] : [{ name: "Calculators", path: "/calculator" as const }]),
+    { name: page.name, path: calculatorPagePath(page) },
+  ];
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs.map((crumb, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: crumb.name,
+      item: absoluteUrl(crumb.path),
+    })),
+  };
+
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c") }}
+      />
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted sm:mb-6">
         <ol className="flex flex-wrap items-center gap-1.5">
           <li>
