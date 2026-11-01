@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { pillLinkClass } from "@/components/link-styles";
 import { timerPagePath, timerPages, type TimerPageSlug } from "@/lib/timer-pages";
 
 type TimerLinksProps = {
@@ -8,8 +9,6 @@ type TimerLinksProps = {
   includeCustom?: boolean;
 };
 
-const pillClass =
-  "inline-flex min-h-10 items-center rounded-full border border-border bg-surface px-4 text-sm font-medium text-foreground hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 export function TimerLinks({ exclude, includeCustom = false }: TimerLinksProps) {
   return (
@@ -18,14 +17,14 @@ export function TimerLinks({ exclude, includeCustom = false }: TimerLinksProps) 
         .filter((page) => page.slug !== exclude)
         .map((page) => (
           <li key={page.slug}>
-            <Link href={timerPagePath(page)} className={pillClass}>
+            <Link href={timerPagePath(page)} className={pillLinkClass}>
               {page.heading}
             </Link>
           </li>
         ))}
       {includeCustom && (
         <li>
-          <Link href="/timer" className={pillClass}>
+          <Link href="/timer" className={pillLinkClass}>
             Custom timer
           </Link>
         </li>

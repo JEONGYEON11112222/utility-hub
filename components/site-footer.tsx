@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { footerLinkClass } from "@/components/link-styles";
 import { calculatorPagePath, calculatorPages } from "@/lib/calculator-pages";
 import { siteConfig, toolCategories } from "@/lib/site";
 import { timerPagePath, timerPages } from "@/lib/timer-pages";
@@ -20,7 +21,7 @@ export function SiteFooter() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="rounded text-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className={footerLinkClass}
                 >
                   {link.label}
                 </Link>
@@ -36,7 +37,7 @@ export function SiteFooter() {
                 {tool.href ? (
                   <Link
                     href={tool.href}
-                    className="rounded text-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    className={footerLinkClass}
                   >
                     {tool.name}
                   </Link>
@@ -56,7 +57,7 @@ export function SiteFooter() {
               <li key={page.slug}>
                 <Link
                   href={calculatorPagePath(page)}
-                  className="rounded text-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className={footerLinkClass}
                 >
                   {page.name}
                 </Link>
@@ -71,7 +72,7 @@ export function SiteFooter() {
               <li key={page.slug}>
                 <Link
                   href={timerPagePath(page)}
-                  className="rounded text-muted underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className={footerLinkClass}
                 >
                   {page.heading}
                 </Link>

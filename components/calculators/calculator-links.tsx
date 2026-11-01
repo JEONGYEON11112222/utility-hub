@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { pillLinkClass } from "@/components/link-styles";
 import {
   calculatorPagePath,
   calculatorPages,
@@ -12,8 +13,6 @@ type CalculatorLinksProps = {
   first?: CalculatorSlug[];
 };
 
-const pillClass =
-  "inline-flex min-h-10 items-center rounded-full border border-border bg-surface px-4 text-sm font-medium text-foreground hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 export function CalculatorLinks({ exclude, first = [] }: CalculatorLinksProps) {
   const ordered = [
@@ -25,7 +24,7 @@ export function CalculatorLinks({ exclude, first = [] }: CalculatorLinksProps) {
     <ul className="flex flex-wrap gap-2">
       {ordered.map((page) => (
         <li key={page.slug}>
-          <Link href={calculatorPagePath(page)} className={pillClass}>
+          <Link href={calculatorPagePath(page)} className={pillLinkClass}>
             {page.name}
           </Link>
         </li>

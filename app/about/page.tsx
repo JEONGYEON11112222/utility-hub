@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { textLinkClass } from "@/components/link-styles";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
@@ -7,9 +8,6 @@ export const metadata = pageMetadata({
   description:
     "What Utility Hub is, how its free timer and calculators are built and checked for accuracy, and how it handles your privacy.",
 });
-
-const linkClass =
-  "font-medium text-accent underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-accent";
 
 export default function AboutPage() {
   return (
@@ -20,11 +18,11 @@ export default function AboutPage() {
       <div className="mt-6 space-y-5 leading-7 text-muted">
         <p>
           Utility Hub is a small collection of free online tools for everyday tasks: a{" "}
-          <Link href="/timer" className={linkClass}>
+          <Link href="/timer" className={textLinkClass}>
             countdown timer
           </Link>{" "}
           and{" "}
-          <Link href="/calculator" className={linkClass}>
+          <Link href="/calculator" className={textLinkClass}>
             calculators
           </Link>{" "}
           for percentages, discounts, tips, sales tax, averages, and fractions. Each tool does one
@@ -65,7 +63,7 @@ export default function AboutPage() {
         <h2 className="pt-2 text-xl font-semibold tracking-tight text-foreground">Privacy</h2>
         <p>
           Utility Hub does not use accounts, cookies, or analytics. Read the{" "}
-          <Link href="/privacy" className={linkClass}>
+          <Link href="/privacy" className={textLinkClass}>
             privacy policy
           </Link>{" "}
           for details.

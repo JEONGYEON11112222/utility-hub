@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CalculatorLinks } from "@/components/calculators/calculator-links";
+import { FaqSection } from "@/components/faq-section";
+import { textLinkClass } from "@/components/link-styles";
 import {
   calculatorPagePath,
   getCalculatorPage,
   type CalculatorSlug,
 } from "@/lib/calculator-pages";
 import { pageMetadata } from "@/lib/seo";
-import { absoluteUrl } from "@/lib/site";
 
 export function calculatorPageMetadata(slug: CalculatorSlug): Metadata {
   const page = getCalculatorPage(slug);
@@ -19,9 +21,6 @@ export function calculatorPageMetadata(slug: CalculatorSlug): Metadata {
   });
 }
 
-const crumbLinkClass =
-  "rounded hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-accent";
-
 /**
  * Shared layout for every calculator page. The route passes in its own calculator widget as
  * children, so each page only ships the client code for that one calculator.
@@ -30,52 +29,16 @@ export function CalculatorPage({ slug, children }: { slug: CalculatorSlug; child
   const page = getCalculatorPage(slug);
   const isHub = slug === "calculator";
 
-  // Structured data for the visible breadcrumb trail below, built from the same items.
-  const crumbs = [
-    { name: "Home", path: "/" as const },
-    ...(isHub ? [] : [{ name: "Calculators", path: "/calculator" as const }]),
-    { name: page.name, path: calculatorPagePath(page) },
-  ];
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: crumbs.map((crumb, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      name: crumb.name,
-      item: absoluteUrl(crumb.path),
-    })),
-  };
-
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-14">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c") }}
+      <Breadcrumbs
+        className="mb-4 sm:mb-6"
+        items={[
+          { name: "Home", path: "/" },
+          ...(isHub ? [] : [{ name: "Calculators", path: "/calculator" as const }]),
+          { name: page.name, path: calculatorPagePath(page) },
+        ]}
       />
-      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted sm:mb-6">
-        <ol className="flex flex-wrap items-center gap-1.5">
-          <li>
-            <Link href="/" className={crumbLinkClass}>
-              Home
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          {!isHub && (
-            <>
-              <li>
-                <Link href="/calculator" className={crumbLinkClass}>
-                  Calculators
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-            </>
-          )}
-          <li aria-current="page" className="text-foreground">
-            {page.name}
-          </li>
-        </ol>
-      </nav>
 
       <div className="max-w-3xl">
         <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
@@ -127,19 +90,7 @@ export function CalculatorPage({ slug, children }: { slug: CalculatorSlug; child
           </section>
         )}
 
-        <section aria-labelledby="faq-heading">
-          <h2 id="faq-heading" className="text-xl font-semibold tracking-tight text-foreground">
-            Frequently asked questions
-          </h2>
-          <div className="mt-4 divide-y divide-border border-y border-border">
-            {page.faqs.map((faq) => (
-              <div key={faq.question} className="py-5">
-                <h3 className="font-semibold text-foreground">{faq.question}</h3>
-                <p className="mt-2 leading-7 text-muted">{faq.answer}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        <FaqSection faqs={page.faqs} />
       </div>
 
       <section aria-labelledby="more-calculators-heading" className="mt-14">
@@ -154,7 +105,7 @@ export function CalculatorPage({ slug, children }: { slug: CalculatorSlug; child
         </div>
         <p className="mt-4 text-sm text-muted">
           Looking for something else?{" "}
-          <Link href="/#tools" className="font-medium text-accent underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-accent">
+          <Link href="/#tools" className={textLinkClass}>
             See all tools
           </Link>
           .

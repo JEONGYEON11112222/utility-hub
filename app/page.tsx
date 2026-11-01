@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CalculatorLinks } from "@/components/calculators/calculator-links";
+import { JsonLd } from "@/components/json-ld";
 import { TimerLinks } from "@/components/timer-links";
 import { pageMetadata } from "@/lib/seo";
 import { absoluteUrl, siteConfig, toolCategories } from "@/lib/site";
@@ -38,10 +39,7 @@ const principles = [
 export default function Home() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd).replace(/</g, "\\u003c") }}
-      />
+      <JsonLd data={websiteJsonLd} />
       <section className="border-b border-border bg-surface">
         <div className="mx-auto w-full max-w-5xl px-4 py-14 sm:px-6 sm:py-20">
           <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-balance text-foreground sm:text-5xl">

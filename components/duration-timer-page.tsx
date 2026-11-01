@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { TimerLinks } from "@/components/timer-links";
 import { pageMetadata } from "@/lib/seo";
@@ -19,25 +19,13 @@ export function DurationTimerPage({ slug }: { slug: TimerPageSlug }) {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted">
-        <ol className="flex flex-wrap items-center gap-1.5">
-          <li>
-            <Link href="/" className="rounded hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-accent">
-              Home
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link href="/timer" className="rounded hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-accent">
-              Timer
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li aria-current="page" className="text-foreground">
-            {page.heading}
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumbs
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Timer", path: "/timer" },
+          { name: page.heading, path: timerPagePath(page) },
+        ]}
+      />
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-start">
         <div>
