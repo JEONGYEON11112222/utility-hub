@@ -362,7 +362,13 @@ export function CountdownTimer({ initialMinutes = 5 }: CountdownTimerProps) {
     if (!clockRef.current) {
       clockRef.current = new CountdownClock(
         browserScheduler,
-        (left) => setRemainingMs(left),
+        // The clock checks every 200 ms so it notices the end promptly, but the display only
+        // changes once a second. Keeping the previous state until the shown second changes
+        // lets React skip the other re-renders.
+        (left) =>
+          setRemainingMs((previous) =>
+            remainingSeconds(previous) === remainingSeconds(left) ? previous : left,
+          ),
         () => {
           setRemainingMs(0);
           setStatus("finished");
@@ -660,9 +666,14 @@ export function CountdownTimer({ initialMinutes = 5 }: CountdownTimerProps) {
         }`}
         aria-hidden="true"
       >
+        {/* Slides a full-width bar instead of changing its width, so each update is a
+            compositor-only transform with no layout. While running, the bar glides across each
+            one-second step; other changes (pause, reset) settle quickly. */}
         <div
-          className="h-full rounded-full bg-accent transition-[width] duration-200 ease-linear motion-reduce:transition-none"
-          style={{ width: `${progress * 100}%` }}
+          className={`h-full rounded-full bg-accent transition-transform ease-linear motion-reduce:transition-none ${
+            status === "running" ? "duration-1000" : "duration-200"
+          }`}
+          style={{ transform: `translateX(${(progress - 1) * 100}%)` }}
         />
       </div>
 
