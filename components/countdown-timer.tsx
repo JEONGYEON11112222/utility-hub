@@ -9,6 +9,14 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import { playChime } from "@/lib/chime";
+import { browserScheduler, CountdownClock } from "@/lib/countdown-clock";
+import {
+  exitFullscreen,
+  type FullscreenCapableElement,
+  getFullscreenElement,
+  subscribeToFullscreen,
+} from "@/lib/fullscreen";
 import {
   describeDuration,
   formatClock,
@@ -17,181 +25,11 @@ import {
   remainingSeconds,
   sanitizeDigits,
 } from "@/lib/timer";
+import { holdScreenWakeLock, type WakeLockStatus } from "@/lib/wake-lock";
 
 type Status = "idle" | "running" | "paused" | "finished";
 
 const PRESET_MINUTES = [1, 3, 5, 10, 15, 25];
-const TICK_MS = 200;
-
-// Short three-note chime built with the Web Audio API, so no audio file or service is needed.
-function playChime(ctx: AudioContext) {
-  const start = ctx.currentTime;
-  [0, 0.35, 0.7].forEach((offset) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.0001, start + offset);
-    gain.gain.exponentialRampToValueAtTime(0.3, start + offset + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + offset + 0.3);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(start + offset);
-    osc.stop(start + offset + 0.32);
-  });
-}
-
-export type ClockScheduler = {
-  now(): number;
-  setTimeout(fn: () => void, ms: number): number;
-  clearTimeout(id: number): void;
-  setInterval(fn: () => void, ms: number): number;
-  clearInterval(id: number): void;
-};
-
-type ClockState = "idle" | "running" | "paused" | "finished";
-
-/**
- * Tracks one countdown independently of React. Remaining time is always derived from a fixed
- * end time, so the display is correct whenever it is checked. Completion is detected by a
- * display interval, a one-shot timeout aimed at the end time, and explicit check() calls
- * (e.g. when the tab becomes visible). Browsers may still delay timers in background tabs,
- * so the exact moment of the alert there is not guaranteed. finish() runs at most once per run.
- */
-export class CountdownClock {
-  private state: ClockState = "idle";
-  private endAt = 0;
-  private remaining = 0;
-  private intervalId: number | null = null;
-  private timeoutId: number | null = null;
-
-  constructor(
-    private readonly scheduler: ClockScheduler,
-    private readonly onTick: (remainingMs: number) => void,
-    private readonly onFinish: () => void,
-    private readonly tickMs = TICK_MS,
-  ) {}
-
-  get currentState(): ClockState {
-    return this.state;
-  }
-
-  start(durationMs: number) {
-    this.clearTimers();
-    this.endAt = this.scheduler.now() + durationMs;
-    this.state = "running";
-    this.arm();
-  }
-
-  /** Returns the time left. If the end time has already passed, the run finishes instead. */
-  pause(): number {
-    if (this.state !== "running") return this.remaining;
-    this.check();
-    if (this.state !== "running") return 0;
-    this.remaining = Math.max(0, this.endAt - this.scheduler.now());
-    this.clearTimers();
-    this.state = "paused";
-    return this.remaining;
-  }
-
-  resume() {
-    if (this.state !== "paused") return;
-    this.endAt = this.scheduler.now() + this.remaining;
-    this.state = "running";
-    this.arm();
-  }
-
-  reset() {
-    this.clearTimers();
-    this.state = "idle";
-    this.remaining = 0;
-  }
-
-  /** Recalculates now and finishes the run if the end time has passed. Safe to call repeatedly. */
-  check = () => {
-    if (this.state !== "running") return;
-    const left = this.endAt - this.scheduler.now();
-    if (left <= 0) this.finish();
-    else this.onTick(left);
-  };
-
-  /** (Re)starts timers for a running countdown, e.g. after the component becomes visible again. */
-  arm() {
-    if (this.state !== "running") return;
-    this.clearTimers();
-    this.intervalId = this.scheduler.setInterval(this.check, this.tickMs);
-    this.scheduleEndTimeout();
-    this.check();
-  }
-
-  /** Stops timers without changing state, e.g. when the component is hidden or unmounted. */
-  suspend() {
-    this.clearTimers();
-  }
-
-  private scheduleEndTimeout() {
-    const left = Math.max(0, this.endAt - this.scheduler.now());
-    this.timeoutId = this.scheduler.setTimeout(() => {
-      this.timeoutId = null;
-      if (this.state !== "running") return;
-      if (this.endAt - this.scheduler.now() <= 0) this.finish();
-      // Timers can fire slightly early; aim again at the remaining time.
-      else this.scheduleEndTimeout();
-    }, left);
-  }
-
-  private finish() {
-    if (this.state !== "running") return;
-    this.state = "finished";
-    this.clearTimers();
-    this.onFinish();
-  }
-
-  private clearTimers() {
-    if (this.intervalId !== null) this.scheduler.clearInterval(this.intervalId);
-    if (this.timeoutId !== null) this.scheduler.clearTimeout(this.timeoutId);
-    this.intervalId = null;
-    this.timeoutId = null;
-  }
-}
-
-const browserScheduler: ClockScheduler = {
-  now: () => Date.now(),
-  setTimeout: (fn, ms) => window.setTimeout(fn, ms),
-  clearTimeout: (id) => window.clearTimeout(id),
-  setInterval: (fn, ms) => window.setInterval(fn, ms),
-  clearInterval: (id) => window.clearInterval(id),
-};
-
-// Fullscreen API helpers. Safari still exposes some of these with a webkit prefix, and
-// iPhone Safari does not support element fullscreen at all.
-type FullscreenDocument = Document & {
-  webkitFullscreenElement?: Element | null;
-  webkitFullscreenEnabled?: boolean;
-  webkitExitFullscreen?: () => Promise<void> | void;
-};
-type FullscreenCapableElement = HTMLElement & {
-  webkitRequestFullscreen?: () => Promise<void> | void;
-};
-
-function getFullscreenElement(): Element | null {
-  const doc = document as FullscreenDocument;
-  return doc.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
-}
-
-async function exitFullscreen() {
-  const doc = document as FullscreenDocument;
-  if (doc.exitFullscreen) await doc.exitFullscreen();
-  else await doc.webkitExitFullscreen?.();
-}
-
-function subscribeToFullscreen(onChange: () => void) {
-  document.addEventListener("fullscreenchange", onChange);
-  document.addEventListener("webkitfullscreenchange", onChange);
-  return () => {
-    document.removeEventListener("fullscreenchange", onChange);
-    document.removeEventListener("webkitfullscreenchange", onChange);
-  };
-}
 
 // Full screen always uses the dark palette from app/globals.css, whatever the system theme,
 // so the clock reads well on TVs and monitors. Utilities read these variables, so overriding
@@ -210,80 +48,8 @@ const FULLSCREEN_THEME = {
   "--danger": "#f87171",
 } as CSSProperties;
 
-// Screen Wake Lock status while a countdown runs. Support itself is read separately.
-type WakeLockStatus = "requesting" | "active" | "released" | "failed";
-
 // Wake Lock support never changes during a page's life, so there is nothing to subscribe to.
 const subscribeToNothing = () => () => {};
-
-// The parts of the Screen Wake Lock API and document this uses, so it can be tested with fakes.
-type WakeLockSentinelLike = {
-  readonly released: boolean;
-  release(): Promise<void>;
-  addEventListener(type: "release", listener: () => void): void;
-};
-type WakeLockApi = { request(type: "screen"): Promise<WakeLockSentinelLike> };
-type VisibilitySource = {
-  readonly visibilityState: DocumentVisibilityState;
-  addEventListener(type: "visibilitychange", listener: () => void): void;
-  removeEventListener(type: "visibilitychange", listener: () => void): void;
-};
-
-/**
- * Holds a screen wake lock until the returned function is called. Requests only while the page
- * is visible, never runs two requests at once, never reuses a released sentinel, requests a new
- * lock when the page becomes visible again, and releases a lock that arrives after stopping.
- * Status is only reported asynchronously. Failures are reported, never thrown.
- */
-export function holdScreenWakeLock(
-  wakeLock: WakeLockApi,
-  page: VisibilitySource,
-  onStatus: (status: Exclude<WakeLockStatus, "requesting">) => void,
-): () => void {
-  let stopped = false;
-  let pending = false;
-  let sentinel: WakeLockSentinelLike | null = null;
-
-  const request = async () => {
-    if (stopped || pending || page.visibilityState !== "visible") return;
-    if (sentinel && !sentinel.released) return;
-    pending = true;
-    try {
-      const lock = await wakeLock.request("screen");
-      if (stopped) {
-        void lock.release().catch(() => {});
-        return;
-      }
-      sentinel = lock;
-      onStatus("active");
-      // Browsers release the lock themselves when the page is hidden or for system reasons.
-      lock.addEventListener("release", () => {
-        if (sentinel !== lock) return;
-        sentinel = null;
-        if (!stopped) onStatus("released");
-      });
-    } catch {
-      // Permission policy, battery saver, or a hidden page; the timer works regardless.
-      if (!stopped) onStatus("failed");
-    } finally {
-      pending = false;
-    }
-  };
-
-  const onVisibilityChange = () => {
-    if (page.visibilityState === "visible") void request();
-  };
-
-  void request();
-  page.addEventListener("visibilitychange", onVisibilityChange);
-  return () => {
-    stopped = true;
-    page.removeEventListener("visibilitychange", onVisibilityChange);
-    const lock = sentinel;
-    sentinel = null;
-    if (lock && !lock.released) void lock.release().catch(() => {});
-  };
-}
 
 type CountdownTimerProps = {
   /** Minutes preselected when the timer first loads. Seconds start at 0. */
