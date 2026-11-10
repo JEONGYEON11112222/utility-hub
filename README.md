@@ -55,3 +55,13 @@ NEXT_PUBLIC_SITE_URL=https://getutilityhub.com
 - Set it in the hosting provider's environment variables (or in `.env.production.local`, which is git-ignored) **before running `next build`**. `NEXT_PUBLIC_` values are inlined at build time, so changing it later requires a rebuild.
 - Use the exact origin you want indexed (`https`, no trailing slash).
 - If it is not set, every URL falls back to `http://localhost:3000`, which is only suitable for local development, and the production build logs a warning.
+
+### Notifying search engines after a deploy
+
+Once a production deploy is live, run:
+
+```bash
+npm run indexnow
+```
+
+This sends every URL in the live sitemap to [IndexNow](https://www.indexnow.org/) (used by Bing, Yandex, Seznam, Naver, and others) so they recrawl changed pages. The verification key file lives in `public/`. Google does not use IndexNow; use Search Console for Google.
