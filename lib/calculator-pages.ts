@@ -141,27 +141,37 @@ export const calculatorPages: CalculatorPage[] = [
     slug: "discount-calculator",
     name: "Discount Calculator",
     heading: "Discount Calculator",
-    metaTitle: "Discount Calculator: Price After % Off & Amount Saved",
+    metaTitle: "Discount Calculator: Sale Price, Stacked Discounts & Tax",
     metaDescription:
-      "How much is 25% off $80? See the sale price ($60.00) and how much you save ($20.00) instantly. Works with any currency, plus tips for stacked discounts.",
+      "Find the price after % off, stack an extra discount (30% then 20% off is 44% off), add sales tax for the price you pay, or work back to the original price.",
     intro:
-      "See what an item costs after a percentage-off sale and how much you save. The calculator works with any currency, since it only uses the numbers you enter.",
+      "See what an item really costs after a sale: the price after one or two discounts, the total you save, and the amount you pay once sales tax is added. You can also work back from a sale price to the original price. Works with any currency.",
     steps: [
-      "Enter the original price.",
-      "Enter the discount percentage, from 0 to 100.",
-      "Read the amount saved and the final price.",
+      "Enter the original price and the discount percentage.",
+      "If there is a second discount, such as an extra 20% off at checkout, enter it as the extra discount. It is taken off the already reduced price.",
+      "If sales tax is added at the register, enter the tax rate to see the final price you pay.",
+      "To find what something cost before a sale, use Original price before a discount with the sale price and the discount.",
     ],
     examples: [
       { title: "25% off", body: "An item that costs 80 with 25% off saves 20 and costs 60." },
       { title: "Odd prices", body: "19.99 with 15% off saves 3.00 (2.9985 rounded) and costs 16.99." },
       {
         title: "Two discounts in a row",
-        body: "20% off and then another 10% off is not 30% off. 100 becomes 80, then 72, which is 28% off in total. Calculate each step separately by using the first final price as the next original price.",
+        body: "20% off and then another 10% off is not 30% off. 100 becomes 80, then 72, which is 28% off in total. Likewise, 30% off and then an extra 20% off takes 100 to 70, then 56, which is 44% off, not 50%.",
+      },
+      {
+        title: "Discount plus sales tax",
+        body: "80 with 25% off is 60. With 8.25% sales tax added, the tax is 4.95 and you pay 64.95. Tax is charged on the sale price, not the original price.",
+      },
+      {
+        title: "Finding the original price",
+        body: "A jacket on sale for 56 after 30% off cost 56 ÷ (1 − 0.30) = 80 before the sale, so 24 was taken off.",
       },
     ],
     notes: [
-      "Amounts are rounded to the cent, and the final price is the original price minus the rounded saving, so the two always add up. Stores may round differently, and sales tax is not included.",
-      "You can type prices with a $, £, or € sign and the discount with a % sign.",
+      "Amounts are rounded to the cent at each step, and every shown amount is built from the rounded ones, so they always add up. Stores may round differently.",
+      "Sales tax is added to the price after all discounts. In many US states, store discounts lower the taxable price but manufacturer coupons do not, so a receipt can differ slightly.",
+      "You can type prices with a $, £, or € sign and percentages with a % sign.",
     ],
     faqs: [
       {
@@ -182,6 +192,16 @@ export const calculatorPages: CalculatorPage[] = [
         question: "How do I find the discount percentage from the original and sale prices?",
         answer:
           "Subtract the sale price from the original price, divide by the original price, and multiply by 100. A price cut from 80 to 60 is (80 − 60) ÷ 80 × 100 = 25% off.",
+      },
+      {
+        question: "Is 30% off plus an extra 20% off the same as 50% off?",
+        answer:
+          "No. The extra 20% comes off the already reduced price, so you pay 70% × 80% = 56% of the original, which is 44% off. Add the extra discount in the calculator to see the exact price.",
+      },
+      {
+        question: "How do I find the original price from a sale price?",
+        answer:
+          "Divide the sale price by 1 minus the discount as a decimal. A $45 item at 25% off was $45 ÷ 0.75 = $60 before the sale.",
       },
     ],
     related: ["percentage-calculator", "sales-tax-calculator", "tip-calculator"],
