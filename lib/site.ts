@@ -56,7 +56,7 @@ export const toolCategories: ToolCategory[] = [
   {
     name: "Calculator",
     summary:
-      "Basic and scientific calculators, plus tools for percentages, discounts, tips, sales tax, averages, and fractions.",
+      "Basic and scientific calculators, plus tools for percentages, discounts, tips, sales tax, averages and weighted averages, and fractions.",
     href: "/calculator",
   },
   {

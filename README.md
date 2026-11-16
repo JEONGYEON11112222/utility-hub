@@ -18,7 +18,8 @@ Free, fast online tools that work right in your browser. No sign-up, no download
 - [Discount calculator](https://getutilityhub.com/discount-calculator): sale price with stacked discounts and sales tax, or the original price from a sale price
 - [Tip calculator](https://getutilityhub.com/tip-calculator): tip, total, and split per person
 - [Sales tax calculator](https://getutilityhub.com/sales-tax-calculator): add tax to a price or remove it from a total
-- [Average calculator](https://getutilityhub.com/average-calculator): mean, sum, and count of a pasted list
+- [Average calculator](https://getutilityhub.com/average-calculator): mean, median, mode, range, and standard deviation of a pasted list
+- [Weighted average calculator](https://getutilityhub.com/weighted-average-calculator): grades, GPA by credit hours, and any weighted mean
 - [Fraction calculator](https://getutilityhub.com/fraction-calculator): simplified answers, mixed numbers, and decimals
 
 ## How it's built

@@ -1,11 +1,41 @@
 "use client";
 
 import { useId, useState } from "react";
-import { cardClass, focusRing, Results } from "@/components/calculators/fields";
-import { MAX_LIST_LENGTH, parseNumberList, summarize } from "@/lib/calculators/average";
+import { cardClass, focusRing, type ResultItem, Results } from "@/components/calculators/fields";
+import { type ListStats, MAX_LIST_LENGTH, parseNumberList, summarize } from "@/lib/calculators/average";
 import { formatNumber } from "@/lib/calculators/format";
 
 const MAX_LISTED_INVALID = 5;
+const MAX_LISTED_MODES = 5;
+
+const show = (value: number) => formatNumber(value, { maxDecimals: 8 });
+
+function modeText(stats: ListStats): string {
+  if (stats.modes.length === 0) {
+    return stats.modeCount === 1 ? "None (no value repeats)" : `None (every value appears ${stats.modeCount} times)`;
+  }
+  const listed = stats.modes.slice(0, MAX_LISTED_MODES).map(show).join(", ");
+  const more = stats.modes.length > MAX_LISTED_MODES ? `, … (${stats.modes.length} values)` : "";
+  const each = stats.modes.length > 1 ? " each" : "";
+  const times = stats.count === 1 ? "" : ` (${stats.modeCount} times${each})`;
+  return `${listed}${more}${times}`;
+}
+
+function statItems(stats: ListStats): ResultItem[] {
+  return [
+    { label: "Average (mean)", value: show(stats.mean), emphasis: true },
+    { label: "Median", value: show(stats.median) },
+    { label: stats.modes.length > 1 ? "Modes" : "Mode", value: modeText(stats) },
+    { label: "Range", value: `${show(stats.range)} (${show(stats.min)} to ${show(stats.max)})` },
+    {
+      label: "Standard deviation (sample)",
+      value: stats.sampleSD === null ? "Needs 2 or more numbers" : show(stats.sampleSD),
+    },
+    { label: "Standard deviation (population)", value: show(stats.populationSD) },
+    { label: "Sum", value: show(stats.sum) },
+    { label: "Count", value: formatNumber(stats.count) },
+  ];
+}
 
 export function AverageCalculator() {
   const id = useId();
@@ -64,15 +94,7 @@ export function AverageCalculator() {
       <Results
         placeholder="Enter at least one number to see the average."
         error={parsed.tooMany ? `Enter at most ${formatNumber(MAX_LIST_LENGTH)} numbers.` : null}
-        items={
-          stats
-            ? [
-                { label: "Average (mean)", value: formatNumber(stats.mean, { maxDecimals: 8 }), emphasis: true },
-                { label: "Sum", value: formatNumber(stats.sum, { maxDecimals: 8 }) },
-                { label: "Count", value: formatNumber(stats.count) },
-              ]
-            : null
-        }
+        items={stats ? statItems(stats) : null}
       />
     </div>
   );

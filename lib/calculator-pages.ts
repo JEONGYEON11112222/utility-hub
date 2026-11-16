@@ -9,6 +9,7 @@ export type CalculatorSlug =
   | "tip-calculator"
   | "sales-tax-calculator"
   | "average-calculator"
+  | "weighted-average-calculator"
   | "fraction-calculator"
   | "scientific-calculator";
 
@@ -319,23 +320,35 @@ export const calculatorPages: CalculatorPage[] = [
     slug: "average-calculator",
     name: "Average Calculator",
     heading: "Average Calculator",
-    metaTitle: "Average Calculator: Find the Mean of a List of Numbers",
+    metaTitle: "Average Calculator: Mean, Median, Mode & Standard Deviation",
     metaDescription:
-      "Paste a list of numbers to get the average (mean), sum, and count instantly. Works with a column copied from Excel or Google Sheets, or numbers in a row.",
+      "Paste a list of numbers to get the mean, median, mode, range, and standard deviation at once. Works with a column copied from Excel or Google Sheets.",
     intro:
-      "Find the average of a list of numbers. Paste a column from a spreadsheet or type numbers separated by commas, spaces, or new lines, and the count, sum, and mean update as you type.",
+      "Find the average of a list of numbers, along with the median, mode, range, and standard deviation. Paste a column from a spreadsheet or type numbers separated by commas, spaces, or new lines, and every result updates as you type.",
     steps: [
       "Type or paste your numbers into the box.",
       "Separate them with commas, spaces, semicolons, or new lines.",
-      "Read the count, sum, and average. Anything that isn't a number is listed so you can fix it.",
+      "Read the mean, median, mode, range, and standard deviation. Anything that isn't a number is listed so you can fix it.",
     ],
     examples: [
-      { title: "Test scores", body: "The average of 72, 85, 90, and 93 is 85: they add up to 340, and 340 ÷ 4 = 85." },
-      { title: "Including negatives", body: "The average of -4, 2, and 8 is 2, because the sum is 6 and 6 ÷ 3 = 2." },
+      {
+        title: "Test scores",
+        body: "For 72, 85, 90, and 93, the mean is 85 (340 ÷ 4). The median is 87.5, halfway between the two middle scores, 85 and 90. There is no mode, because no score repeats, and the range is 93 − 72 = 21.",
+      },
+      {
+        title: "Mean, median, and mode can differ",
+        body: "For 2, 3, 3, and 8, the mean is 4, but the median and the mode are both 3. The single large value, 8, pulls the mean up while the median stays put.",
+      },
+      {
+        title: "Standard deviation",
+        body: "For 2, 4, 4, 4, 5, 5, 7, and 9, the mean is 5. The population standard deviation is 2, and the sample standard deviation is about 2.138, because it divides by 7 (n − 1) instead of 8.",
+      },
+      { title: "Including negatives", body: "The average of -4, 2, and 8 is 2, because the sum is 6 and 6 ÷ 3 = 2. The median is also 2." },
     ],
     notes: [
       "Thousands separators work when numbers are separated by spaces, new lines, or a comma and a space: 1,500, 2,000 averages to 1,750. If you use commas with no spaces, every comma separates numbers, so 1,500,2,000 is read as 1, 500, 2, and 0. Use a period for decimals.",
-      "This is the arithmetic mean. It does not calculate the median, mode, or a weighted average.",
+      "When every value appears the same number of times, such as 1, 1, 2, 2, no value stands out, so there is no mode. When two or more values tie for most frequent, all of them are listed.",
+      "If some numbers should count more than others, such as grades worth different percentages, use the weighted average calculator.",
     ],
     faqs: [
       {
@@ -345,7 +358,17 @@ export const calculatorPages: CalculatorPage[] = [
       {
         question: "What is the difference between the mean, median, and mode?",
         answer:
-          "The mean is the sum divided by the count. The median is the middle value once the numbers are sorted, and the mode is the value that appears most often. For 2, 3, 3, and 8, the mean is 4, the median is 3, and the mode is 3. This calculator gives the mean.",
+          "The mean is the sum divided by the count. The median is the middle value once the numbers are sorted, and the mode is the value that appears most often. For 2, 3, 3, and 8, the mean is 4, the median is 3, and the mode is 3.",
+      },
+      {
+        question: "How do I find the median of an even number of values?",
+        answer:
+          "Sort the numbers and take the average of the two in the middle. For 3, 7, 9, and 12, the middle values are 7 and 9, so the median is 8.",
+      },
+      {
+        question: "Should I use the sample or population standard deviation?",
+        answer:
+          "Use the population standard deviation when your list includes every value you care about, such as all students in one class. Use the sample standard deviation when the list is a sample from a larger group, such as 50 survey answers standing in for all customers. The sample version divides by n − 1 and matches STDEV.S in Excel, while the population version matches STDEV.P.",
       },
       {
         question: "Can I paste numbers from Excel or Google Sheets?",
@@ -355,10 +378,67 @@ export const calculatorPages: CalculatorPage[] = [
       {
         question: "How do I average percentages or grades?",
         answer:
-          "Enter the values without the % sign, for example 85, 92, 78. This gives a simple average, where every value counts equally. If some grades count more than others, you need a weighted average instead.",
+          "Enter the values without the % sign, for example 85, 92, 78. This gives a simple average, where every value counts equally. If some grades count more than others, use the weighted average calculator instead.",
       },
     ],
-    related: ["percentage-calculator", "calculator", "scientific-calculator"],
+    related: ["weighted-average-calculator", "percentage-calculator", "calculator"],
+  },
+  {
+    slug: "weighted-average-calculator",
+    name: "Weighted Average Calculator",
+    heading: "Weighted Average Calculator",
+    metaTitle: "Weighted Average Calculator: Grades, GPA & Weighted Mean",
+    metaDescription:
+      "Enter values and their weights to get the weighted average. Weights can be percentages or credit hours, e.g. 90 (20%), 80 (30%), 70 (50%) gives 77.",
+    intro:
+      "Find an average where some values count more than others, such as a course grade made of homework, a midterm, and a final, or a GPA weighted by credit hours. Add a row for each value and its weight, and the weighted average updates as you type.",
+    steps: [
+      "In each row, enter a value (a score or grade) and its weight (a percentage, credit hours, or a count).",
+      "Press Add row for more values. Rows left completely empty are ignored.",
+      "Read the weighted average. The simple average is shown next to it, so you can see how much the weights change the result.",
+    ],
+    examples: [
+      {
+        title: "A course grade",
+        body: "Homework 90 worth 20%, the midterm 80 worth 30%, and the final 70 worth 50%: (90 × 20 + 80 × 30 + 70 × 50) ÷ 100 = (1,800 + 2,400 + 3,500) ÷ 100 = 77. The simple average of the three scores would be 80.",
+      },
+      {
+        title: "GPA by credit hours",
+        body: "A 4.0 in a 3-credit class and a 3.0 in a 4-credit class: (4 × 3 + 3 × 4) ÷ 7 = 24 ÷ 7 ≈ 3.43. The 4-credit class counts for more, so the GPA sits closer to 3.0.",
+      },
+      {
+        title: "Weights that don't add up to 100",
+        body: "Weights of 1, 1, and 2 work just like 25%, 25%, and 50%. The calculator always divides by the total weight, so you don't need to convert them first.",
+      },
+    ],
+    notes: [
+      "Weighted average = Σ(value × weight) ÷ Σ(weight). If every weight is the same, the result equals the simple average.",
+      "Weights can't be negative, and at least one must be above zero. Values can be any number, including decimals and negatives. A % sign after a value or weight is accepted.",
+      "For a GPA, enter the grade points for each class (for example, A = 4.0 and B = 3.0 on the common US 4.0 scale) and use credit hours as the weights. Schools differ on plus and minus grades, so check your school's scale.",
+    ],
+    faqs: [
+      {
+        question: "How do you calculate a weighted average?",
+        answer:
+          "Multiply each value by its weight, add those products, and divide by the sum of the weights. For 90 weighted 2 and 60 weighted 1: (90 × 2 + 60 × 1) ÷ 3 = 240 ÷ 3 = 80.",
+      },
+      {
+        question: "Do the weights have to add up to 100%?",
+        answer:
+          "No. The calculator divides by whatever the weights add up to. If your syllabus weights add up to less than 100% because some grades are still to come, the result is your current grade on the work done so far.",
+      },
+      {
+        question: "What is the difference between a weighted and a simple average?",
+        answer:
+          "A simple average counts every value equally. A weighted average lets some values count more. Scores of 90, 80, and 70 average to 80, but if the 70 is a final exam worth 50% (with 20% and 30% for the others), the weighted average drops to 77.",
+      },
+      {
+        question: "How do I calculate my GPA with credit hours?",
+        answer:
+          "Enter each class's grade points as the value and its credit hours as the weight. The weighted average is your GPA. For example, an A (4.0) in a 3-credit class and a B (3.0) in a 4-credit class give a GPA of about 3.43.",
+      },
+    ],
+    related: ["average-calculator", "percentage-calculator", "calculator"],
   },
   {
     slug: "fraction-calculator",
