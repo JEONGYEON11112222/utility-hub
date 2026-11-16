@@ -50,7 +50,7 @@ export const toolCategories: ToolCategory[] = [
   {
     name: "Timer",
     summary:
-      "Count down from any number of minutes and seconds, with pause, resume, and an alert when time is up.",
+      "Count down from any number of minutes and seconds, or run HIIT and Tabata intervals, with an alert when time is up.",
     href: "/timer",
   },
   {

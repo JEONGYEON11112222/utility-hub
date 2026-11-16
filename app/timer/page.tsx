@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { FaqSection } from "@/components/faq-section";
+import { textLinkClass } from "@/components/link-styles";
 import { TimerLinks } from "@/components/timer-links";
 import { pageMetadata } from "@/lib/seo";
 
@@ -83,7 +85,14 @@ export default function TimerPage() {
             </h2>
             <ul className="mt-4 list-disc space-y-2 pl-5 leading-7 text-muted">
               <li>Focused work blocks, such as 25 minutes of work followed by a 5 minute break.</li>
-              <li>Exercise intervals, stretching, and rest periods between sets.</li>
+              <li>
+                Exercise intervals, stretching, and rest periods between sets. For repeating
+                work and rest rounds, try the{" "}
+                <Link href="/interval-timer" className={textLinkClass}>
+                  interval timer for HIIT and Tabata
+                </Link>
+                .
+              </li>
               <li>Cooking and baking steps when your oven timer is already in use.</li>
               <li>Timed tests, presentations, and classroom activities.</li>
             </ul>

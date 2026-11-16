@@ -8,13 +8,14 @@ Free, fast online tools that work right in your browser. No sign-up, no download
 
 **Timer**
 - [Online countdown timer](https://getutilityhub.com/timer): any length, with pause, resume, an alarm chime, full-screen mode for TVs and projectors, and a screen wake lock while it runs
+- [Interval timer](https://getutilityhub.com/interval-timer): HIIT and Tabata rounds of work and rest, with beeps at each switch and a 3-2-1 countdown
 - Ready-to-start timers: [1](https://getutilityhub.com/1-minute-timer), [5](https://getutilityhub.com/5-minute-timer), [10](https://getutilityhub.com/10-minute-timer), [15](https://getutilityhub.com/15-minute-timer), [20](https://getutilityhub.com/20-minute-timer), [25 (Pomodoro)](https://getutilityhub.com/25-minute-timer), [30](https://getutilityhub.com/30-minute-timer), and [60](https://getutilityhub.com/60-minute-timer) minutes
 
 **Calculators**
 - [Basic calculator](https://getutilityhub.com/calculator) with keyboard support
 - [Scientific calculator](https://getutilityhub.com/scientific-calculator): parentheses, powers, roots, trig, and logs
 - [Percentage calculator](https://getutilityhub.com/percentage-calculator): percent of a number, what percent, and percentage change
-- [Discount calculator](https://getutilityhub.com/discount-calculator): sale price and amount saved
+- [Discount calculator](https://getutilityhub.com/discount-calculator): sale price with stacked discounts and sales tax, or the original price from a sale price
 - [Tip calculator](https://getutilityhub.com/tip-calculator): tip, total, and split per person
 - [Sales tax calculator](https://getutilityhub.com/sales-tax-calculator): add tax to a price or remove it from a total
 - [Average calculator](https://getutilityhub.com/average-calculator): mean, sum, and count of a pasted list

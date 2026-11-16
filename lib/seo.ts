@@ -50,6 +50,7 @@ export function pageMetadata({
 export const indexablePaths: SitePath[] = [
   "/",
   "/timer",
+  "/interval-timer",
   ...timerPages.map(timerPagePath),
   ...calculatorPages.map(calculatorPagePath),
   "/about",

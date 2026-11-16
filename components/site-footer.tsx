@@ -78,6 +78,11 @@ export function SiteFooter() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link href="/interval-timer" className={footerLinkClass}>
+                Interval timer
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>

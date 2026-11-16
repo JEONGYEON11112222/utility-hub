@@ -7,10 +7,11 @@ type TimerLinksProps = {
   exclude?: TimerPageSlug;
   /** Add a link to the custom-length timer at /timer. */
   includeCustom?: boolean;
+  /** Add a link to the interval (HIIT / Tabata) timer. */
+  includeInterval?: boolean;
 };
 
-
-export function TimerLinks({ exclude, includeCustom = false }: TimerLinksProps) {
+export function TimerLinks({ exclude, includeCustom = false, includeInterval = true }: TimerLinksProps) {
   return (
     <ul className="flex flex-wrap gap-2">
       {timerPages
@@ -22,6 +23,13 @@ export function TimerLinks({ exclude, includeCustom = false }: TimerLinksProps) 
             </Link>
           </li>
         ))}
+      {includeInterval && (
+        <li>
+          <Link href="/interval-timer" className={pillLinkClass}>
+            Interval timer (HIIT)
+          </Link>
+        </li>
+      )}
       {includeCustom && (
         <li>
           <Link href="/timer" className={pillLinkClass}>

@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  type CSSProperties,
   useEffect,
   useId,
   useLayoutEffect,
@@ -9,6 +8,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import { FULLSCREEN_THEME } from "@/components/fullscreen-theme";
 import { playChime } from "@/lib/chime";
 import { browserScheduler, CountdownClock } from "@/lib/countdown-clock";
 import {
@@ -30,23 +30,6 @@ import { holdScreenWakeLock, type WakeLockStatus } from "@/lib/wake-lock";
 type Status = "idle" | "running" | "paused" | "finished";
 
 const PRESET_MINUTES = [1, 3, 5, 10, 15, 25];
-
-// Full screen always uses the dark palette from app/globals.css, whatever the system theme,
-// so the clock reads well on TVs and monitors. Utilities read these variables, so overriding
-// them on the fullscreen element re-themes everything inside it.
-const FULLSCREEN_THEME = {
-  "--background": "#0b0b0c",
-  "--foreground": "#f4f4f5",
-  "--surface": "#18181b",
-  "--muted-surface": "#27272a",
-  "--muted": "#a1a1aa",
-  "--border": "#3f3f46",
-  "--accent": "#2dd4bf",
-  "--accent-strong": "#5eead4",
-  "--accent-soft": "#042f2e",
-  "--on-accent": "#042f2e",
-  "--danger": "#f87171",
-} as CSSProperties;
 
 // Wake Lock support never changes during a page's life, so there is nothing to subscribe to.
 const subscribeToNothing = () => () => {};
