@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import { cardClass, focusRing, type ResultItem, Results } from "@/components/calculators/fields";
 import { type ListStats, MAX_LIST_LENGTH, parseNumberList, summarize } from "@/lib/calculators/average";
 import { formatNumber } from "@/lib/calculators/format";
+import { ShareLink, useShareHash } from "@/components/share-link";
 
 const MAX_LISTED_INVALID = 5;
 const MAX_LISTED_MODES = 5;
@@ -40,6 +41,7 @@ function statItems(stats: ListStats): ResultItem[] {
 export function AverageCalculator() {
   const id = useId();
   const [text, setText] = useState("");
+  useShareHash("n", (params) => setText(params.get("n") ?? ""));
   const parsed = parseNumberList(text);
   const stats = parsed.tooMany ? null : summarize(parsed.numbers);
   const invalidCount = parsed.invalid.length;
@@ -96,6 +98,7 @@ export function AverageCalculator() {
         error={parsed.tooMany ? `Enter at most ${formatNumber(MAX_LIST_LENGTH)} numbers.` : null}
         items={stats ? statItems(stats) : null}
       />
+      {stats && <ShareLink params={{ n: text.trim() }} />}
     </div>
   );
 }

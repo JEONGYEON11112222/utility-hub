@@ -5,6 +5,7 @@ import { cardClass, focusRing, type ResultItem, Results } from "@/components/cal
 import { summarize, weightedAverage, type WeightedEntry } from "@/lib/calculators/average";
 import { formatNumber } from "@/lib/calculators/format";
 import { readField } from "@/lib/calculators/parse";
+import { ShareLink, useShareHash } from "@/components/share-link";
 
 const MAX_ROWS = 50;
 
@@ -25,6 +26,15 @@ export function WeightedAverageCalculator() {
   // After "Add row", focus moves to the new row's value field as soon as it mounts.
   const focusKeyRef = useRef<number | null>(null);
 
+  useShareHash("v", (params) => {
+    // Repeated v= and w= pairs, so values with thousands separators (1,500) survive.
+    const values = params.getAll("v");
+    const weights = params.getAll("w");
+    const count = Math.min(Math.max(values.length, weights.length), MAX_ROWS);
+    setRows(Array.from({ length: count }, (_, i) => ({ key: i + 1, value: values[i] ?? "", weight: weights[i] ?? "" })));
+    setNextKey(count + 1);
+  });
+
   const entries: WeightedEntry[] = [];
   const errors: string[] = [];
   rows.forEach((row, index) => {
@@ -39,6 +49,8 @@ export function WeightedAverageCalculator() {
     if (v.status === "ok" && w.status === "ok") entries.push({ value: v.value, weight: w.value });
   });
 
+  // Raw text, not parsed numbers, so a shared link reopens exactly what was typed.
+  const filled = rows.filter((row) => row.value.trim() || row.weight.trim());
   const result = errors.length === 0 && entries.length > 0 ? weightedAverage(entries) : null;
   const simple = summarize(entries.map((e) => e.value));
   let items: ResultItem[] | null = null;
@@ -156,6 +168,9 @@ export function WeightedAverageCalculator() {
         error={result && !result.ok ? result.error : null}
         items={items}
       />
+      {items && (
+        <ShareLink params={filled.flatMap((r) => [["v", r.value.trim()], ["w", r.weight.trim()]])} />
+      )}
     </div>
   );
 }

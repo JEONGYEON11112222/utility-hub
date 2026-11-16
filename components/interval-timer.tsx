@@ -24,6 +24,7 @@ import {
 } from "@/lib/interval-timer";
 import { describeDuration, formatClock, remainingSeconds, sanitizeDigits } from "@/lib/timer";
 import { holdScreenWakeLock, type WakeLockStatus } from "@/lib/wake-lock";
+import { ShareLink, useShareHash } from "@/components/share-link";
 
 type Status = "idle" | "running" | "paused" | "finished";
 type Field = "work" | "rest" | "rounds" | "prep";
@@ -44,6 +45,13 @@ export function IntervalTimer() {
   const [rest, setRest] = useState(String(tabata.restSeconds));
   const [rounds, setRounds] = useState(String(tabata.rounds));
   const [prep, setPrep] = useState(String(tabata.prepSeconds));
+  useShareHash("work", (params) => {
+    // Same sanitizing as typing, so a hand-edited link can't put anything odd in the fields.
+    setWork(sanitizeDigits(params.get("work") ?? "", 4));
+    setRest(sanitizeDigits(params.get("rest") ?? "", 4));
+    setRounds(sanitizeDigits(params.get("rounds") ?? "", 2));
+    setPrep(sanitizeDigits(params.get("prep") ?? "", 2));
+  });
   const [status, setStatus] = useState<Status>("idle");
   const [remainingMs, setRemainingMs] = useState(0);
   const [soundOn, setSoundOn] = useState(true);
@@ -458,6 +466,10 @@ export function IntervalTimer() {
             Reset
           </button>
         </div>
+
+        {!isFullscreen && status === "idle" && parsed.ok && (
+          <ShareLink params={{ work, rest, rounds, prep }} />
+        )}
 
         {!isFullscreen && (
           <div className="mt-5 flex items-center gap-2">

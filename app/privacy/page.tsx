@@ -9,7 +9,7 @@ export const metadata = pageMetadata({
 
 // Update this date whenever the policy text changes. It is a fixed string because rendering
 // the current date would make the page dynamic.
-const LAST_UPDATED = "October 27, 2026";
+const LAST_UPDATED = "November 17, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -32,6 +32,12 @@ export default function PrivacyPage() {
           The timer and calculators run entirely in your browser. Numbers, times, and lists you
           enter are processed on your device and are not sent to or stored on our servers. They
           are gone when you close or reload the page.
+        </p>
+        <p>
+          Some tools have a &ldquo;Copy link to these numbers&rdquo; button. It puts your inputs
+          in the part of the address after the # sign, which browsers don&apos;t send to our
+          servers. Anyone you give the link to can see those numbers, so only share links you
+          are comfortable sharing.
         </p>
 
         <h2 className="pt-2 text-xl font-semibold tracking-tight text-foreground">

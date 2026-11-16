@@ -5,6 +5,7 @@ import { cardClass, fieldError, NumberField, Results, type ResultItem } from "@/
 import { formatAmount, formatPercent } from "@/lib/calculators/format";
 import { calculateSale, originalPrice } from "@/lib/calculators/money";
 import { readField } from "@/lib/calculators/parse";
+import { ShareLink, useShareHash } from "@/components/share-link";
 
 function SalePriceCard() {
   const id = useId();
@@ -12,6 +13,12 @@ function SalePriceCard() {
   const [percent, setPercent] = useState("");
   const [extra, setExtra] = useState("");
   const [taxRate, setTaxRate] = useState("");
+  useShareHash("price", (params) => {
+    setPrice(params.get("price") ?? "");
+    setPercent(params.get("off") ?? "");
+    setExtra(params.get("extra") ?? "");
+    setTaxRate(params.get("tax") ?? "");
+  });
   const p = readField(price, { label: "The original price", min: 0, unit: "money" });
   const d = readField(percent, { label: "The discount", min: 0, max: 100, unit: "percent" });
   const e = readField(extra, { label: "The extra discount", min: 0, max: 100, unit: "percent" });
@@ -77,6 +84,7 @@ function SalePriceCard() {
         />
       </div>
       <Results placeholder="Enter a price and a discount to see the sale price." items={items} />
+      {items && <ShareLink params={{ price, off: percent, ...(extra && { extra }), ...(taxRate && { tax: taxRate }) }} />}
     </section>
   );
 }
