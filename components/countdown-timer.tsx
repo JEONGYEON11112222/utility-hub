@@ -9,6 +9,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { FULLSCREEN_THEME } from "@/components/fullscreen-theme";
+import { useShareHash } from "@/components/share-link";
 import { playChime } from "@/lib/chime";
 import { browserScheduler, CountdownClock } from "@/lib/countdown-clock";
 import {
@@ -42,6 +43,11 @@ type CountdownTimerProps = {
 export function CountdownTimer({ initialMinutes = 5 }: CountdownTimerProps) {
   const [minutes, setMinutes] = useState(String(initialMinutes));
   const [seconds, setSeconds] = useState("0");
+  // Old /N-minute-timer URLs redirect to /timer#minutes=N.
+  useShareHash("minutes", (params) => {
+    setMinutes(sanitizeDigits(params.get("minutes") ?? "", 3));
+    setSeconds("0");
+  });
   const [status, setStatus] = useState<Status>("idle");
   const [remainingMs, setRemainingMs] = useState(0);
   const [totalMs, setTotalMs] = useState(0);

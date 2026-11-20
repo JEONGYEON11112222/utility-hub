@@ -1,16 +1,11 @@
-// Content for the fixed-duration timer landing pages (/1-minute-timer, /5-minute-timer, ...).
+// Content for the fixed-duration timer landing pages (/5-minute-timer, /10-minute-timer, /25-minute-timer).
 // Each route file under app/ picks its entry by slug, so adding a page means adding an
 // entry here plus a small route file. Keep each entry's copy specific to its duration.
 
 export type TimerPageSlug =
-  | "1-minute-timer"
   | "5-minute-timer"
   | "10-minute-timer"
-  | "15-minute-timer"
-  | "20-minute-timer"
-  | "25-minute-timer"
-  | "30-minute-timer"
-  | "60-minute-timer";
+  | "25-minute-timer";
 
 export type TimerPage = {
   slug: TimerPageSlug;
@@ -27,33 +22,6 @@ export type TimerPage = {
 };
 
 export const timerPages: TimerPage[] = [
-  {
-    slug: "1-minute-timer",
-    minutes: 1,
-    heading: "1 Minute Timer",
-    metaTitle: "1 Minute Timer for Quick Drills and Challenges",
-    metaDescription:
-      "A free 60-second countdown timer that's ready to start. Use it for plank holds, speaking practice, quick-write prompts, and one-minute games.",
-    intro:
-      "Sixty seconds goes faster than you'd expect, so it's worth timing properly. This timer is already set to one minute: press Start and it counts down to zero, then shows a message and plays a chime.",
-    usesHeading: "What to do in one minute",
-    uses: [
-      "Hold a plank, wall sit, or stretch for a full minute without checking a clock.",
-      "Practice a short self-introduction or elevator pitch and see what fits in 60 seconds.",
-      "Run a one-minute quick-write or a rapid-recall round in class.",
-      "Keep turns fair in party games where each player gets one minute.",
-    ],
-    tips: [
-      {
-        heading: "Repeat it for intervals",
-        body: "When the minute is up, press Start again to run another round. Reset returns to one minute if you paused partway through.",
-      },
-      {
-        heading: "Need a few extra seconds?",
-        body: "Change the seconds field before you start, for example 1 minute 30 seconds for a slightly longer hold.",
-      },
-    ],
-  },
   {
     slug: "5-minute-timer",
     minutes: 5,
@@ -109,60 +77,6 @@ export const timerPages: TimerPage[] = [
     ],
   },
   {
-    slug: "15-minute-timer",
-    minutes: 15,
-    heading: "15 Minute Timer",
-    metaTitle: "15 Minute Timer for Study Blocks and Short Rests",
-    metaDescription:
-      "A free 15-minute countdown timer for homework blocks, presentation practice, short rests, and quarter-hour planning sessions.",
-    intro:
-      "A quarter of an hour works well for a single focused task. The timer is set to 15 minutes. Start it, pause it if you're interrupted, and resume where you left off.",
-    usesHeading: "Ways to use 15 minutes",
-    uses: [
-      "A homework or revision block for younger students, followed by a short break.",
-      "Rehearsing a presentation or speech to check that it fits the time you've been given.",
-      "A short rest. Lie down or close your eyes without worrying about oversleeping.",
-      "Planning tomorrow: review your calendar, list priorities, and clear your inbox.",
-    ],
-    tips: [
-      {
-        heading: "Pause instead of restarting",
-        body: "If someone interrupts you, press Pause. Resume continues from the exact time left rather than starting over.",
-      },
-      {
-        heading: "Adjust before you start",
-        body: "You can change the minutes or seconds before starting, for example to 12 minutes for a shorter talk.",
-      },
-    ],
-  },
-  {
-    slug: "20-minute-timer",
-    minutes: 20,
-    heading: "20 Minute Timer",
-    metaTitle: "20 Minute Timer for Focus, Exercise, and Screen Breaks",
-    metaDescription:
-      "A free 20-minute countdown timer for study sessions, a walk or run, screen-break reminders, and timed activities, with an alert at zero.",
-    intro:
-      "Twenty minutes gives you room to settle into a task without committing to a full hour. This timer is set to 20 minutes and alerts you on screen, and with an optional chime, when time is up.",
-    usesHeading: "When a 20 minute timer helps",
-    uses: [
-      "A focused study or writing session with one clear goal.",
-      "A walk, an easy run, or a yoga session.",
-      "A screen-break reminder. The commonly recommended 20-20-20 rule suggests looking at something about 20 feet away for 20 seconds every 20 minutes.",
-      "Timed classroom or team activities where each stage needs a clear limit.",
-    ],
-    tips: [
-      {
-        heading: "Repeat for regular reminders",
-        body: "When the chime sounds, take your break, then press Start again for the next 20 minutes.",
-      },
-      {
-        heading: "Keep the tab open",
-        body: "The timer keeps accurate time in a background tab. Leave this page open in its own tab while you work.",
-      },
-    ],
-  },
-  {
     slug: "25-minute-timer",
     minutes: 25,
     heading: "25 Minute Timer",
@@ -185,61 +99,7 @@ export const timerPages: TimerPage[] = [
       },
       {
         heading: "Adapt the length if you need to",
-        body: "Twenty-five minutes is a starting point, not a rule. If longer sessions suit you, try the 30 or 60 minute timer.",
-      },
-    ],
-  },
-  {
-    slug: "30-minute-timer",
-    minutes: 30,
-    heading: "30 Minute Timer",
-    metaTitle: "30 Minute Timer for Workouts, Meetings, and Reading",
-    metaDescription:
-      "A free 30-minute countdown timer for workouts, meetings, reading, and timed practice sections. Pause, resume, and reset whenever you need.",
-    intro:
-      "Half an hour suits a full workout, a focused meeting, or a solid stretch of reading. This timer is set to 30 minutes and stays accurate even if your device puts the tab in the background.",
-    usesHeading: "What to time in half an hour",
-    uses: [
-      "A complete workout, including warm-up and cool-down.",
-      "A meeting with a fixed end time so the agenda stays on track.",
-      "Reading, practicing an instrument, or language study.",
-      "A timed section of a practice test.",
-    ],
-    tips: [
-      {
-        heading: "Split it into parts",
-        body: "For a mixed session, glance at the time left to switch activities, for example warm up until 25:00 remains.",
-      },
-      {
-        heading: "Check your volume",
-        body: "Make sure your device isn't muted if you're relying on the chime to know when time is up.",
-      },
-    ],
-  },
-  {
-    slug: "60-minute-timer",
-    minutes: 60,
-    heading: "60 Minute Timer",
-    metaTitle: "60 Minute Timer (1 Hour Countdown)",
-    metaDescription:
-      "A free one-hour countdown timer for deep work, practice exams, longer study sessions, and activities that need a clear end time.",
-    intro:
-      "An hour gives you time for deep, uninterrupted work or a full practice session. This timer is set to 60 minutes and shows hours, minutes, and seconds as it counts down.",
-    usesHeading: "Good uses for a one-hour timer",
-    uses: [
-      "A deep work block on a single demanding task.",
-      "A full-length practice exam or timed assignment.",
-      "A longer study or rehearsal session, with a break when the chime sounds.",
-      "Setting a clear limit for screen time, gaming, or an activity with a set end time.",
-    ],
-    tips: [
-      {
-        heading: "Plan a break afterward",
-        body: "After an hour of focus, step away for a few minutes before you start the next session.",
-      },
-      {
-        heading: "Longer than an hour?",
-        body: "Enter any time up to 999 minutes in the minutes field, for example 90 minutes for a longer session.",
+        body: "Twenty-five minutes is a starting point, not a rule. If longer sessions suit you, set any length you like on the custom timer.",
       },
     ],
   },
